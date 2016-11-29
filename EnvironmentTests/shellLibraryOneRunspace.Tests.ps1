@@ -1,15 +1,20 @@
+<#
+Keeping any reference to an object returned by a call to WindowsAPICodePack.Shell.ShellLibrary
+can cause errors on subsequent calls.  The solution to this seems to be to relinquish all
+references to WindowsAPICodePack.Shell.ShellLibrary then collect garbage between calls.
+#>
+
 Describe 'set up environment' {
     It 'add the Windows API Code Pack assembly' {
         Add-Type -Path "$PSScriptRoot\..\bin\winapicp\Microsoft.WindowsAPICodePack.Shell.dll"
     }
 }
-foreach ( $i in 1..1 )
-{
+
 Describe "ShellLibrary - One Runspace ($i)" {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
     $libraryName = "MyLibrary-$guidFrag"
     $h = @{}
-    BeforeEach { [gc]::Collect() }
+    AfterEach { [gc]::Collect() }
     It 'create a new library' {
         $overwrite = $false
         $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$overwrite)
@@ -17,46 +22,29 @@ Describe "ShellLibrary - One Runspace ($i)" {
     }
     It 'get the new library' {
         $readonly = $false
-        $h.NewLibrary = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$readonly)
-        $h.NewLibrary.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.ShellLibrary'
-        $h.NewLibrary.Name | Should be $libraryName
+        $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$readonly)
+        $r.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.ShellLibrary'
+        $r.Name | Should be $libraryName
     }
     It 'get the library''s type' {
-        $r = $h.NewLibrary.LibraryType
+        $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+        $r = $r.LibraryType
         $r | Should beNullOrEmpty
     }
-    It 'setting the new library''s type sometimes throws an exception' {
-        try
-        { 
-            $h.NewLibrary.LibraryType = [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::Pictures
-        }
-        catch
-        {
-            $_.Exception | Should match 'Exception setting "LibraryType"'
-        }
+    It 'set the new library''s type' {
+        $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+        $r.LibraryType = [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::Pictures
     }
     It 'get the library''s type' {
-        $r = $h.NewLibrary.LibraryType.ToString()
+        $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+        $r = $r.LibraryType
         $r | Should be 'Pictures'
     }
-    It 'get an icon resource id' {
-        $h.MusicIconResourceId =  [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load('Music',$true).IconResourceId
-        $h.MusicIconResourceId.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.IconReference'
-    }
-    It 'setting the new library''s icon sometimes throws an exception' {
-        try
-        {
-            $h.NewLibrary.IconResourceId = $h.MusicIconResourceId
-        }
-        catch
-        {
-            $_.Exception | Should match 'Exception setting "IconResourceId"'
-        }
-    }
-    It 'dispose the library' {
-        $l = $h.NewLibrary
-        $h.Remove('NewLibrary')
-        $l.Dispose()
+    It 'set the new library''s icon' {
+        $i = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load('Music',$true).IconResourceId
+        $i.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.IconReference'
+        $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+        $l.IconResourceId = $i
     }
     It 'compose the path to the library' {
         $librariesPath = [System.IO.Path]::Combine(
@@ -66,52 +54,23 @@ Describe "ShellLibrary - One Runspace ($i)" {
         $libraryPath = [System.IO.Path]::Combine($librariesPath, $libraryName);
         $h.NewLibraryPath = [System.IO.Path]::ChangeExtension($libraryPath, "library-ms")
     }
-    It 'record the library item' {
-        $h.NewLibraryItem = Get-Item $h.NewLibraryPath -ea Stop
+    It 'get the library item' {
+        $r = Get-Item $h.NewLibraryPath -ea Stop
+        $r | Should not beNullOrEmpty
     }
     It 'remove the new library' {
         [System.IO.File]::Delete($h.NewLibraryPath)
     }
     It 'the library item can no longer be retrieved' {
-        try
-        {
-            Get-Item $h.NewLibraryPath -ea Stop
-        }
-        catch
-        {
-            $_.Exception | Should match '(it does not exist|Access is denied)'
-        }
+        { Get-Item $h.NewLibraryPath -ea Stop } |
+            Should throw 'it does not exist'
     }
-    It 'sometimes testing the library path returns false, sometimes access is denied' {
-        try
-        {
-            $r = Test-Path $h.NewLibraryPath -ea Stop
-        }
-        catch
-        {
-            $threw = $true
-            $_.Exception | Should match 'Access is denied'
-        }
-        if ( -not $threw )
-        {
-            $r | Should be $false
-        }
+    It 'testing the library path returns false' {
+        $r = Test-Path $h.NewLibraryPath -ea Stop
+        $r | Should be $false
     }
     It 'the removed library can sometimes still be loaded' {
-        $readonly = $false
-        try
-        {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$readonly)
-        }
-        catch
-        {
-            $threw = $true
-            $_.Exception | Should match 'Shell Exception has occurred'
-        }
-        if ( -not $threw )
-        {
-            $r.Name | Should be $libraryName
-        }
+        { [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false) } |
+            Should throw 'Shell Exception has occurred'
     }
-}
 }
