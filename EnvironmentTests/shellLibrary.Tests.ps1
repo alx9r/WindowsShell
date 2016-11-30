@@ -10,7 +10,7 @@ Describe 'set up environment' {
     }
 }
 
-Describe "ShellLibrary - One Runspace ($i)" {
+Describe "ShellLibrary" {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
     $libraryName = "MyLibrary-$guidFrag"
     $h = @{}
@@ -41,7 +41,8 @@ Describe "ShellLibrary - One Runspace ($i)" {
         $r | Should be 'Pictures'
     }
     It 'set the new library''s icon' {
-        $i = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load('Music',$true).IconResourceId
+        $i = [Microsoft.WindowsAPICodePack.Shell.IconReference]::new('C:\WINDOWS\system32\imageres.dll,-94')
+        #$i = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load('Music',$true).IconResourceId
         $i.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.IconReference'
         $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
         $l.IconResourceId = $i
