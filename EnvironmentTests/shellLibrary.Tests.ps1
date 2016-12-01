@@ -14,18 +14,31 @@ Describe "ShellLibrary" {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
     $libraryName = "MyLibrary-$guidFrag"
     $h = @{}
-    AfterEach { [gc]::Collect() }
     Context 'creation' {
         It 'create a new library' {
-            $overwrite = $false
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$overwrite)
-            $r.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.ShellLibrary'
+            try
+            {
+                $overwrite = $false
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$overwrite)
+                $l.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.ShellLibrary'
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'get the new library' {
-            $readonly = $false
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$readonly)
-            $r.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.ShellLibrary'
-            $r.Name | Should be $libraryName
+            try
+            {
+                $readonly = $false
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$readonly)
+                $l.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.ShellLibrary'
+                $l.Name | Should be $libraryName
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'creating the library again without overwrite set throws' {
             { [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$false) } |
@@ -34,40 +47,89 @@ Describe "ShellLibrary" {
     }
     Context 'library type' {
         It 'get the library''s type' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $r = $r.LibraryType
-            $r | Should beNullOrEmpty
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $r = $l.LibraryType
+                $r | Should beNullOrEmpty
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'set the new library''s type' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $r.LibraryType = [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::Pictures
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $l.LibraryType = [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::Pictures
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'modifying the new library''s type with readonly set throws' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$true)
-            { $r.LibraryType = [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::Pictures } |
-                Should throw 'Access Denied'
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$true)
+                { $l.LibraryType = [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::Pictures } |
+                    Should throw 'Access Denied'
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'get the library''s type' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $r.LibraryType | Should be 'Pictures'
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $l.LibraryType | Should be 'Pictures'
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
     }
     Context 'icon' {
         It 'set the new library''s icon' {
-            $i = [Microsoft.WindowsAPICodePack.Shell.IconReference]::new('C:\WINDOWS\system32\imageres.dll,-94')
-            $i.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.IconReference'
-            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $l.IconResourceId = $i
+            try
+            {
+                $i = [Microsoft.WindowsAPICodePack.Shell.IconReference]::new('C:\WINDOWS\system32\imageres.dll,-94')
+                $i.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.IconReference'
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $l.IconResourceId = $i
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'get the library''s icon' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false).IconResourceId
-            $r.ReferencePath | Should be 'C:\WINDOWS\system32\imageres.dll,-94'
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $l.IconResourceId.ReferencePath | Should be 'C:\WINDOWS\system32\imageres.dll,-94'
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'modifying the new library''s icon with readonly set throws' {
-            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$true)
-            $i = [Microsoft.WindowsAPICodePack.Shell.IconReference]::new('C:\WINDOWS\system32\imageres.dll,-94')
-            { $l.IconResourceId = $i } |
-                Should throw 'Access Denied'
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$true)
+                $i = [Microsoft.WindowsAPICodePack.Shell.IconReference]::new('C:\WINDOWS\system32\imageres.dll,-94')
+                { $l.IconResourceId = $i } |
+                    Should throw 'Access Denied'
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
     }
     Context 'deletion' {
@@ -101,32 +163,62 @@ Describe "ShellLibrary" {
     }
     Context 're-creation' {
         It 'the removed library can be created again without overwrite flag' {
-            [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$false)
+            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$false)
+            $l.Dispose()
         }
         It 'get the library again' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $r.Name | Should be $libraryName
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $l.Name | Should be $libraryName
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
     }
     Context 'overwriting' {
         It 'the library''s type is empty' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $r.LibraryType | Should beNullOrEmpty        
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $l.LibraryType | Should beNullOrEmpty        
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'set the library''s type' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $r.LibraryType = [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::Pictures
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $l.LibraryType = [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::Pictures
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'get the library''s type' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $r.LibraryType | Should be 'Pictures'
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $l.LibraryType | Should be 'Pictures'
+            }
+            finally
+            {
+                $l.Dispose()
+            }
         }
         It 'overwrite the library' {
-            [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$true)
+            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$true)
+            $l.Dispose()
         }
         It 'the library''s type is empty again' {
-            $r = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $r.LibraryType | Should beNullOrEmpty        
+            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+            $l.LibraryType | Should beNullOrEmpty        
         }
     }
     Context 'cleanup' {

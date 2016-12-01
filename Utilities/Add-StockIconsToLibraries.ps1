@@ -12,14 +12,21 @@ Describe 'add stock icons to libraries' {
                 $h.RefPath = [PInvoker.PInvoker]::GetIconRefPath([int]$value)
             }
             It 'create the library' {
-                [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$true)
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$true)
+                $l.Dispose()
             }
             [gc]::Collect()
             It "set the icon to $($h.RefPath)" {
-                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-                $l.IconResourceId = $h.RefPath
+                try
+                {
+                    $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                    $l.IconResourceId = $h.RefPath
+                }
+                finally
+                {
+                    $l.Dispose()
+                }
             }
-            [gc]::Collect()
         }
     }
 }
