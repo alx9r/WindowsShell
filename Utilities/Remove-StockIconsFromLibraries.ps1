@@ -1,4 +1,5 @@
 Describe 'remove stock icons from libraries' {
+    $guidFrag = '8ecdff81'
     It 'add the Windows API Code Pack assembly' {
         Add-Type -Path "$PSScriptRoot\..\bin\winapicp\Microsoft.WindowsAPICodePack.Shell.dll"
     }
