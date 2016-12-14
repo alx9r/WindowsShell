@@ -178,6 +178,8 @@ function Set-ShellLibraryType
                 "library named $Name not found"
             )
         }
+
+        # the libary exists
         try
         {
             $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($Name,$false)
@@ -209,7 +211,7 @@ function Get-StockIconReferencePath
     }
 }
 
-function Set-ShellLibraryStockIcon
+function Set-ShellLibraryIconReferencePath
 {
     [CmdletBinding()]
     param
@@ -221,17 +223,11 @@ function Set-ShellLibraryStockIcon
         $Name,
 
         [Parameter(position = 1)]
-        [Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier]
-        $StockIconName
+        [Microsoft.WindowsAPICodePack.Shell.IconReference]
+        $IconReferencePath
     )
     process
     {
-        # retrieve the reference path of the stock icon
-        $referencePath = $StockIconName | Get-StockIconReferencePath
-
-        # create the icon reference
-        $i = [Microsoft.WindowsAPICodePack.Shell.IconReference]::new($referencePath)
-
         if ( -not ( $Name | Test-ShellLibrary ) )
         {
             # the library doesn't exist
@@ -243,11 +239,8 @@ function Set-ShellLibraryStockIcon
         # the library exists
         try
         {
-            # retrieve the library
             $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($Name,$false)
-
-            # assign the icon
-            $l.IconResourceId = $i
+            $l.IconResourceId = $IconReferencePath
         }
         finally
         {

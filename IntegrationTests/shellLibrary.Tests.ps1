@@ -167,9 +167,9 @@ Describe Get-StockIconReferencePath {
     }
 }
 
-Describe Set-ShellLibraryStockIcon {
+Describe Set-ShellLibraryIconReferencePath {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
-    $libraryName = "Set-ShellLibraryStockIcon-$guidFrag"
+    $libraryName = "Set-ShellLibraryIconReferencePath-$guidFrag"
     Context 'library exists' {
         It 'create the library' {
             $libraryName | Add-ShellLibrary
@@ -183,7 +183,7 @@ Describe Set-ShellLibraryStockIcon {
             $r.IconReferencePath | Should beNullOrEmpty
         }
         It 'returns nothing' {
-            $r = $libraryName | Set-ShellLibraryStockIcon 'Application'
+            $r = $libraryName | Set-ShellLibraryIconReferencePath 'C:\WINDOWS\system32\imageres.dll,-15'
             $r | Should beNullOrEmpty
         }
         It 'the icon reference path is correct' {
@@ -202,7 +202,7 @@ Describe Set-ShellLibraryStockIcon {
             $r | Should be $false
         }
         It 'throws correct exception' {
-            { $libraryName | Set-ShellLibraryStockIcon 'Application' } |
+            { $libraryName | Set-ShellLibraryIconReferencePath 'C:\WINDOWS\system32\imageres.dll,-15' } |
                 Should throw "library named $libraryName not found"
         }
     }
