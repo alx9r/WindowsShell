@@ -163,6 +163,7 @@ function Set-ShellLibraryProperty
                    ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
         [string]
+        [Alias('Name')]
         $LibraryName,
 
         [Parameter(Mandatory = $true,
