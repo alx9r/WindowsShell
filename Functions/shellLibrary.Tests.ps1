@@ -38,6 +38,11 @@ Describe Test-ValidStockIconName {
 
 Describe Invoke-ProcessShellLibrary {
     InModuleScope WindowsShell {
+        Mock Get-ShellLibrary
+        Mock Add-ShellLibrary
+        Mock Remove-ShellLibrary
+        Mock Set-ShellLibraryType
+        Mock Set-ShellLibraryStockIcon
         Context 'not present, Set Present' {
             Mock Get-ShellLibrary -Verifiable
             Mock Add-ShellLibrary {
@@ -46,7 +51,7 @@ Describe Invoke-ProcessShellLibrary {
                 }
             } -Verifiable
             Mock Set-ShellLibraryType -Verifiable
-            Mock Set-ShellLibraryIcon -Verifiable
+            Mock Set-ShellLibraryStockIcon -Verifiable
             It 'returns nothing' {
                 $splat = @{
                     Mode = 'Set'
@@ -61,7 +66,24 @@ Describe Invoke-ProcessShellLibrary {
                 Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
                 Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
                 Assert-MockCalled Set-ShellLibraryType 1 { $TypeName -eq 'Pictures' }
-                Assert-MockCalled Set-ShellLibraryIcon 1 { $StockIconName -eq 'Application' }
+                Assert-MockCalled Set-ShellLibraryStockIcon 1 { $StockIconName -eq 'Application' }
+            }
+        }
+        Context 'not present, Test Present' {
+            Mock Get-ShellLibrary -Verifiable
+            It 'returns false' {
+                $splat = @{
+                    Mode = 'Test'
+                    Name = 'library name'
+                    TypeName = 'Pictures'
+                    StockIconName = 'Application'
+                }
+                $r = Invoke-ProcessShellLibrary @splat
+                $r.Count | Should be 1
+                $r | Should be $false
+            }
+            It 'correctly invokes functions' {
+                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
             }
         }
         Context 'present, Set Present' {
@@ -74,7 +96,7 @@ Describe Invoke-ProcessShellLibrary {
             } -Verifiable
             Mock Add-ShellLibrary -Verifiable
             Mock Set-ShellLibraryType -Verifiable
-            Mock Set-ShellLibraryIcon -Verifiable
+            Mock Set-ShellLibraryStockIcon -Verifiable
             It 'returns nothing' {
                 $splat = @{
                     Mode = 'Set'
@@ -87,9 +109,52 @@ Describe Invoke-ProcessShellLibrary {
             }
             It 'correctly invokes functions' {
                 Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary -Exactly -Times 0
-                Assert-MockCalled Set-ShellLibraryType -Exactly -Times 0
-                Assert-MockCalled Set-ShellLibraryIcon -Exactly -Times 0
+            }
+        }
+        Context 'present, Test present' {
+            Mock Get-ShellLibrary {
+                New-Object ShellLibrary -Property @{
+                    Name = 'libary name'
+                    TypeName = 'Pictures'
+                    StockIconName = 'Application'
+                }
+            } -Verifiable
+            It 'returns true' {
+                $splat = @{
+                    Mode = 'Test'
+                    Name = 'library name'
+                    TypeName = 'Pictures'
+                    StockIconName = 'Application'
+                }
+                $r = Invoke-ProcessShellLibrary @splat
+                $r.Count | Should be 1
+                $r | Should be $true
+            }
+            It 'correctly invokes functions' {
+                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            }
+        }
+        Context 'present wrong type, Test present' {
+            Mock Get-ShellLibrary {
+                New-Object ShellLibrary -Property @{
+                    Name = 'libary name'
+                    TypeName = 'Pictures'
+                    StockIconName = 'Application'
+                }
+            } -Verifiable
+            It 'returns false' {
+                $splat = @{
+                    Mode = 'Test'
+                    Name = 'library name'
+                    TypeName = 'Music'
+                    StockIconName = 'Application'
+                }
+                $r = Invoke-ProcessShellLibrary @splat
+                $r.Count | Should be 1
+                $r | Should be $false
+            }
+            It 'correctly invokes functions' {
+                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
             }
         }
     }

@@ -111,7 +111,7 @@ function Set-ShellLibraryType
     }
 }
 
-function Set-ShellLibraryIcon
+function Set-ShellLibraryStockIcon
 {
     [CmdletBinding()]
     param
@@ -128,7 +128,7 @@ function Set-ShellLibraryIcon
     )
     process
     {
-        throw [System.NotImplementedException]::new('Set-ShellLibraryIcon')
+        throw [System.NotImplementedException]::new('Set-ShellLibraryStockIcon')
     }
 }
 
@@ -165,25 +165,53 @@ function Invoke-ProcessShellLibrary
         # retrieve the library
         $library = $Name | Get-ShellLibrary
 
+
+        # process library existence
         if ( -not $library )
         {
-            # create the library
-            $library = $Name | Add-ShellLibrary
+            switch( $Mode )
+            {
+                'Set'  { $library = $Name | Add-ShellLibrary } # create the library
+                'Test' { return $false }                       # the library doesn't exist
+            }
         }
 
-        if ( $library.TypeName -ne $TypeName )
+        # process library type and icon
+        foreach
+        ( 
+            $instruction in @(
+                @{
+                    PropertyName = 'TypeName'
+                    SetterName = 'Set-ShellLibraryType'
+                    SetValue = $TypeName 
+                }
+                @{
+                    PropertyName = 'StockIconName'
+                    SetterName = 'Set-ShellLibraryStockIcon'
+                    SetValue = $StockIconName
+                }
+            )
+        )
         {
-            # correct the library type
-            $library | Set-ShellLibraryType $TypeName
-        }
-
-        if ( $library.StockIconName -ne $StockIconName )
-        {
-            # correct the icon
-            $library | Set-ShellLibraryIcon $StockIconName
+            if ( $library.$($instruction.PropertyName) -ne $instruction.SetValue )
+            {
+                switch ( $Mode )
+                {
+                    'Set'  { 
+                         # correct the property
+                        $library | & $instruction.SetterName $instruction.SetValue
+                    }
+                    'Test' { return $false } # the property is incorrect
+                }
+            }
         }
 
         # if a folder order is provided invoke Test-ShellLibraryFoldersSortOrder, Sort-ShellLibraryFolders
+
+        if ( $Mode -eq 'Test' )
+        {
+            return $true
+        }
     }
 }
 
