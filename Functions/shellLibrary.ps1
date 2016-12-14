@@ -1,4 +1,5 @@
-Set-Alias Test-ValidLibraryName Test-ValidFileName
+Set-Alias Test-ValidShellLibraryName Test-ValidFileName
+
 function Test-ValidShellLibraryTypeName
 {
     [CmdletBinding()]
@@ -14,52 +15,175 @@ function Test-ValidShellLibraryTypeName
         $out = New-Object Microsoft.WindowsAPICodePack.Shell.LibraryFolderType
         if ( -not [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::TryParse($TypeName,[ref]$out) )
         {
-            &(Publish-Failure "$TypeName not a valid library type name",'TypeName' ([System.ArgumentException]))
+            &(Publish-Failure "$TypeName is not a valid library type name",'TypeName' ([System.ArgumentException]))
             return $false
         }
         return $true
     }
 }
-function Test-ValidStockIconName { throw [System.NotImplementedException]::new('Test-ShellLibraryName') }
-
-function Set-ShellLibrary
+function Test-ValidStockIconName
 {
     [CmdletBinding()]
     param
     (
-        [ValidateSet('Present','Absent')]
-        $Ensure='Present',
+        [Parameter(ValueFromPipeline = $true,
+                   Mandatory = $true)]
+        [string]
+        $StockIconName
+    )
+    process
+    {
+        $out = New-Object Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier
+        if ( -not [Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier]::TryParse($StockIconName,[ref]$out) )
+        {
+            &(Publish-Failure "$StockIconName is not a valid stock icon name",'IconName' ([System.ArgumentException]))
+            return $false
+        }
+        return $true
+    }
+}
 
-        [Parameter(Mandatory = $true)]
+function Remove-ShellLibrary
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true)]
+        [string]
+        $Name
+    )
+    process
+    {
+        throw [System.NotImplementedException]::new('Remove-ShellLibrary')
+    }
+}
+
+function Get-ShellLibrary
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true)]
+        [string]
+        $Name
+    )
+    process
+    {
+        throw [System.NotImplementedException]::new('Get-ShellLibrary')
+    }
+}
+
+function Add-ShellLibrary
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true)]
+        $Name
+    )
+    process
+    {
+        throw [System.NotImplementedException]::new('New-ShellLibrary')
+    }
+}
+
+function Set-ShellLibraryType
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true,
+                   ValueFromPipelineByPropertyName = $true)]
         [string]
         $Name,
 
+        [Parameter(position = 1)]
+        [string]
+        $TypeName
+    )
+    process
+    {
+        throw [System.NotImplementedException]::new('Set-ShellLibraryType')
+    }
+}
+
+function Set-ShellLibraryIcon
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string]
+        $Name,
+
+        [Parameter(position = 1)]
+        [string]
+        $StockIconName
+    )
+    process
+    {
+        throw [System.NotImplementedException]::new('Set-ShellLibraryIcon')
+    }
+}
+
+function Invoke-ProcessShellLibrary
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Set','Test')]
+        $Mode,
+
+        [ValidateSet('Present','Absent')]
+        $Ensure = 'Present',
+
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
+        [string]
+        $Name,
+
+        [ValidateScript({ $_ | Test-ValidShellLibraryTypeName })]
         [string]
         $TypeName,
 
+        [ValidateScript({ $_ | Test-ValidStockIconName })]
         [string]
-        $IconName,
+        $StockIconName,
 
         [string[]]
         $FolderOrder
     )
     process
     {
-        # test valid name
-        # test valid type
-        # test valid icon name
+        # retrieve the library
+        $library = $Name | Get-ShellLibrary
 
-        # if ensure is absent just remove the library and return
+        if ( -not $library )
+        {
+            # create the library
+            $library = $Name | Add-ShellLibrary
+        }
 
-        # if the library doesn't exist, create it
+        if ( $library.TypeName -ne $TypeName )
+        {
+            # correct the library type
+            $library | Set-ShellLibraryType $TypeName
+        }
 
-        # if the type is provided and is incorrect, correct it
-
-        # if the icon is provided and is incorrect, correct it
+        if ( $library.StockIconName -ne $StockIconName )
+        {
+            # correct the icon
+            $library | Set-ShellLibraryIcon $StockIconName
+        }
 
         # if a folder order is provided invoke Test-ShellLibraryFoldersSortOrder, Sort-ShellLibraryFolders
-
-        throw [System.NotImplementedException]::new('Set-ShellLibrary')
     }
 }
 
