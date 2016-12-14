@@ -137,10 +137,12 @@ function Invoke-ProcessShellLibrary
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true,
+                   Position = 1)]
         [ValidateSet('Set','Test')]
         $Mode,
 
+        [Parameter(Position = 2)]
         [ValidateSet('Present','Absent')]
         $Ensure = 'Present',
 
@@ -167,12 +169,34 @@ function Invoke-ProcessShellLibrary
 
 
         # process library existence
-        if ( -not $library )
+        switch ( $Ensure )
         {
-            switch( $Mode )
-            {
-                'Set'  { $library = $Name | Add-ShellLibrary } # create the library
-                'Test' { return $false }                       # the library doesn't exist
+            'Present' {
+                if ( -not $library )
+                {
+                    switch( $Mode )
+                    {
+                        'Set'  { $library = $Name | Add-ShellLibrary } # create the library
+                        'Test' { return $false }                       # the library doesn't exist
+                    }
+                }
+            }
+            'Absent' {
+                switch ( $Mode )
+                {
+                    'Set'  { 
+                        if ( $library )
+                        {
+                            # the library exists, remove it
+                            $Name | Remove-ShellLibrary
+                        }
+                        return
+                    }
+                    'Test'
+                    {
+                        return -not $library
+                    }
+                }
             }
         }
 
