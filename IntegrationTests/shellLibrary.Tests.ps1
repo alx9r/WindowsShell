@@ -121,7 +121,7 @@ Describe Remove-ShellLibrary {
 
 Describe Set-ShellLibraryType {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
-    $libraryName = "Remove-ShellLibrary-$guidFrag"
+    $libraryName = "Set-ShellLibraryType-$guidFrag"
     Context 'library exists' {
         It 'create the library' {
             $libraryName | Add-ShellLibrary
@@ -155,6 +155,54 @@ Describe Set-ShellLibraryType {
         }
         It 'throws correct exception' {
             { $libraryName | Set-ShellLibraryType 'Pictures' } |
+                Should throw "library named $libraryName not found"
+        }
+    }
+}
+
+Describe Get-StockIconReferencePath {
+    It 'returns correct value' {
+        $r = 'World' | Get-StockIconReferencePath
+        $r | Should be 'C:\WINDOWS\system32\imageres.dll,-152'
+    }
+}
+
+Describe Set-ShellLibraryStockIcon {
+    $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
+    $libraryName = "Set-ShellLibraryStockIcon-$guidFrag"
+    Context 'library exists' {
+        It 'create the library' {
+            $libraryName | Add-ShellLibrary
+        }
+        It 'the library exists' {
+            $r = $libraryName | Test-ShellLibrary
+            $r | Should be $true
+        }
+        It 'the icon referance path is empty' {
+            $r = $libraryName | Get-ShellLibrary
+            $r.IconReferencePath | Should beNullOrEmpty
+        }
+        It 'returns nothing' {
+            $r = $libraryName | Set-ShellLibraryStockIcon 'Application'
+            $r | Should beNullOrEmpty
+        }
+        It 'the icon reference path is correct' {
+            $r = $libraryName | Get-ShellLibrary
+            $r.IconReferencePath | Should be 'C:\WINDOWS\system32\imageres.dll,-15'
+        }
+    }
+    Context 'cleanup' {
+        It 'remove the library' {
+            $libraryName | Remove-ShellLibrary
+        }
+    }
+    Context 'library does not exist' {
+        It 'the library does not exist' {
+            $r = $libraryName | Test-ShellLibrary
+            $r | Should be $false
+        }
+        It 'throws correct exception' {
+            { $libraryName | Set-ShellLibraryStockIcon 'Application' } |
                 Should throw "library named $libraryName not found"
         }
     }
