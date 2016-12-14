@@ -130,7 +130,18 @@ function Remove-ShellLibrary
     )
     process
     {
-        throw [System.NotImplementedException]::new('Remove-ShellLibrary')
+        $path = $Name | Get-ShellLibraryPath
+        try
+        {
+            Remove-Item $path -ea Stop | Out-Null
+        }
+        catch [System.Management.Automation.ItemNotFoundException]
+        {
+            throw [System.Management.Automation.ItemNotFoundException]::new(
+                "Shell library named $Name not found.",
+                $_.Exception
+            )
+        }
     }
 }
 

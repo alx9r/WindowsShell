@@ -84,3 +84,37 @@ Describe Add-ShellLibrary {
         }
     }
 }
+
+Describe Remove-ShellLibrary {
+    $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
+    $libraryName = "Remove-ShellLibrary-$guidFrag"
+    Context 'library exists' {
+        It 'create the library' {
+            $libraryName | Add-ShellLibrary
+        }
+        It 'confirm the library exists' {
+            $r = $libraryName | Test-ShellLibrary
+            $r | Should be $true
+            $r = $libraryName | Get-ShellLibrary
+            $r.Name | Should be $libraryName
+        }
+        It 'returns nothing' {
+            $r = $libraryName | Remove-ShellLibrary
+            $r | Should beNullOrEmpty
+        }
+        It 'confirm the library no longer exists' {
+            $r = $libraryName | Test-ShellLibrary
+            $r | Should be $false
+        }
+    }
+    Context 'library does not exist' {
+        It 'confirm the library does not exist' {
+            $r = $libraryName | Test-ShellLibrary
+            $r | Should be $false
+        }
+        It 'throws correct exception' {
+            { $libraryName | Remove-ShellLibrary } |
+                Should throw "library named $libraryName not found"
+        }
+    }
+}
