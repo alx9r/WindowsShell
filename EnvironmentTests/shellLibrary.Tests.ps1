@@ -27,6 +27,27 @@ Describe "ShellLibrary" {
                 $l.Dispose()
             }
         }
+        It 'creating an existing library throws' {
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$false)
+            }
+            catch [System.Runtime.InteropServices.COMException]
+            {
+                $threw = $true
+                $_.Exception | Should match 'already exists'
+                $_.Exception | Should match '0x80030050'
+                $_.Exception | Should match 'STG_E_FILEALREADYEXISTS'
+            }
+            finally
+            {
+                if ( $null -ne $l )
+                {
+                    $l.Dispose()
+                }
+            }
+            $threw | Should be $true
+        }
         It 'get the new library' {
             try
             {
