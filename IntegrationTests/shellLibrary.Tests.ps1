@@ -29,7 +29,7 @@ Describe Get-ShellLibrary {
             $r.Name | Should be $libraryName
             $r.GetType() | Should be 'ShellLibrary'
         }
-        It 'populates type name' {
+        It 'populates library type' {
             $r = $libraryName | Get-ShellLibrary
             $r.TypeName | Should be 'Pictures'
         }
@@ -119,43 +119,51 @@ Describe Remove-ShellLibrary {
     }
 }
 
-Describe Set-ShellLibraryType {
-    $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
-    $libraryName = "Set-ShellLibraryType-$guidFrag"
-    Context 'library exists' {
-        It 'create the library' {
-            $libraryName | Add-ShellLibrary
+foreach ( $values in @(
+        @( 'TypeName', 'Pictures' ),
+        @( 'IconReferencePath', 'C:\WINDOWS\system32\imageres.dll,-15' )
+    )
+)
+{
+    $propertyName,$propertyValue = $values
+    Describe "Set-ShellLibraryProperty $propertyName" {
+        $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
+        $libraryName = "Set-ShellLibraryProperty-$guidFrag"
+        Context 'library exists' {
+            It 'create the library' {
+                $libraryName | Add-ShellLibrary
+            }
+            It 'the library exists' {
+                $r = $libraryName | Test-ShellLibrary
+                $r | Should be $true
+            }
+            It "the property $propertyName is empty" {
+                $r = $libraryName | Get-ShellLibrary
+                $r.$propertyName | Should beNullOrEmpty
+            }
+            It 'returns nothing' {
+                $r = $libraryName | Set-ShellLibraryProperty $propertyName $propertyValue
+                $r | Should beNullOrEmpty
+            }
+            It 'the type name is correct' {
+                $r = $libraryName | Get-ShellLibrary
+                $r.$propertyName | Should be $propertyValue
+            }
         }
-        It 'the library exists' {
-            $r = $libraryName | Test-ShellLibrary
-            $r | Should be $true
+        Context 'cleanup' {
+            It 'remove the library' {
+                $libraryName | Remove-ShellLibrary
+            }
         }
-        It 'the type name is empty' {
-            $r = $libraryName | Get-ShellLibrary
-            $r.TypeName | Should beNullOrEmpty
-        }
-        It 'returns nothing' {
-            $r = $libraryName | Set-ShellLibraryType 'Pictures'
-            $r | Should beNullOrEmpty
-        }
-        It 'the type name is correct' {
-            $r = $libraryName | Get-ShellLibrary
-            $r.TypeName | Should be 'Pictures'
-        }
-    }
-    Context 'cleanup' {
-        It 'remove the library' {
-            $libraryName | Remove-ShellLibrary
-        }
-    }
-    Context 'library does not exist' {
-        It 'the library does not exist' {
-            $r = $libraryName | Test-ShellLibrary
-            $r | Should be $false
-        }
-        It 'throws correct exception' {
-            { $libraryName | Set-ShellLibraryType 'Pictures' } |
-                Should throw "library named $libraryName not found"
+        Context 'library does not exist' {
+            It 'the library does not exist' {
+                $r = $libraryName | Test-ShellLibrary
+                $r | Should be $false
+            }
+            It 'throws correct exception' {
+                { $libraryName | Set-ShellLibraryProperty $propertyName $propertyValue } |
+                    Should throw "library named $libraryName not found"
+            }
         }
     }
 }
@@ -164,46 +172,5 @@ Describe Get-StockIconReferencePath {
     It 'returns correct value' {
         $r = 'World' | Get-StockIconReferencePath
         $r | Should be 'C:\WINDOWS\system32\imageres.dll,-152'
-    }
-}
-
-Describe Set-ShellLibraryIconReferencePath {
-    $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
-    $libraryName = "Set-ShellLibraryIconReferencePath-$guidFrag"
-    Context 'library exists' {
-        It 'create the library' {
-            $libraryName | Add-ShellLibrary
-        }
-        It 'the library exists' {
-            $r = $libraryName | Test-ShellLibrary
-            $r | Should be $true
-        }
-        It 'the icon referance path is empty' {
-            $r = $libraryName | Get-ShellLibrary
-            $r.IconReferencePath | Should beNullOrEmpty
-        }
-        It 'returns nothing' {
-            $r = $libraryName | Set-ShellLibraryIconReferencePath 'C:\WINDOWS\system32\imageres.dll,-15'
-            $r | Should beNullOrEmpty
-        }
-        It 'the icon reference path is correct' {
-            $r = $libraryName | Get-ShellLibrary
-            $r.IconReferencePath | Should be 'C:\WINDOWS\system32\imageres.dll,-15'
-        }
-    }
-    Context 'cleanup' {
-        It 'remove the library' {
-            $libraryName | Remove-ShellLibrary
-        }
-    }
-    Context 'library does not exist' {
-        It 'the library does not exist' {
-            $r = $libraryName | Test-ShellLibrary
-            $r | Should be $false
-        }
-        It 'throws correct exception' {
-            { $libraryName | Set-ShellLibraryIconReferencePath 'C:\WINDOWS\system32\imageres.dll,-15' } |
-                Should throw "library named $libraryName not found"
-        }
     }
 }

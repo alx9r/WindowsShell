@@ -154,7 +154,7 @@ function Remove-ShellLibrary
     }
 }
 
-function Set-ShellLibraryType
+function Set-ShellLibraryProperty
 {
     [CmdletBinding()]
     param
@@ -163,27 +163,39 @@ function Set-ShellLibraryType
                    ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
         [string]
-        $Name,
+        $LibraryName,
 
-        [Parameter(position = 1)]
+        [Parameter(Mandatory = $true,
+                   position = 1)]
+        [ValidateSet('TypeName','IconReferencePath')]
         [string]
-        $TypeName
+        $PropertyName,
+
+        [Parameter(Mandatory = $true,
+                   position = 2)]
+        $Value
     )
     process
     {
-        if ( -not ( $Name | Test-ShellLibrary ) )
+        if ( -not ( $LibraryName | Test-ShellLibrary ) )
         {
             # the library doesn't exist
             throw [System.Management.Automation.ItemNotFoundException]::new(
-                "library named $Name not found"
+                "library named $LibraryName not found"
             )
         }
 
         # the libary exists
         try
         {
-            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($Name,$false)
-            $l.LibraryType = $TypeName
+            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($LibraryName,$false)
+            switch ( $PropertyName )
+            {
+                'TypeName' { $l.LibraryType = $Value }
+                'IconReferencePath' {
+                    $l.IconResourceId = [Microsoft.WindowsAPICodePack.Shell.IconReference]::new($Value)
+                }
+            }
         }
         finally
         {
@@ -208,46 +220,5 @@ function Get-StockIconReferencePath
     process
     {
         return [StockIconInfo.StockIconInfo]::GetIconRefPath([int]$StockIconName)
-    }
-}
-
-function Set-ShellLibraryIconReferencePath
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true,
-                   ValueFromPipeline = $true,
-                   ValueFromPipelineByPropertyName = $true)]
-        [string]
-        $Name,
-
-        [Parameter(position = 1)]
-        [Microsoft.WindowsAPICodePack.Shell.IconReference]
-        $IconReferencePath
-    )
-    process
-    {
-        if ( -not ( $Name | Test-ShellLibrary ) )
-        {
-            # the library doesn't exist
-            throw [System.Management.Automation.ItemNotFoundException]::new(
-                "library named $Name not found"
-            )
-        }
-
-        # the library exists
-        try
-        {
-            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($Name,$false)
-            $l.IconResourceId = $IconReferencePath
-        }
-        finally
-        {
-            if ( $null -ne $l )
-            {
-                $l.Dispose()
-            }
-        }
     }
 }

@@ -111,33 +111,30 @@ function Invoke-ProcessShellLibrary
             }
         }
 
-        # process library type and icon
-        foreach
-        ( 
-            $instruction in @(
-                @{
-                    PropertyName = 'TypeName'
-                    SetterName = 'Set-ShellLibraryType'
-                    SetValue = $TypeName 
-                }
-                @{
-                    PropertyName = 'StockIconName'
-                    SetterName = 'Set-ShellLibraryStockIcon'
-                    SetValue = $StockIconName
-                }
-            )
-        )
+        # process library type
+        if ( $library.TypeName -ne $TypeName )
         {
-            if ( $library.$($instruction.PropertyName) -ne $instruction.SetValue )
+            switch ( $Mode )
             {
-                switch ( $Mode )
-                {
-                    'Set'  { 
-                         # correct the property
-                        $library | & $instruction.SetterName $instruction.SetValue
-                    }
-                    'Test' { return $false } # the property is incorrect
+                'Set' {
+                    # correct the property
+                    $library | Set-ShellLibraryProperty TypeName $TypeName
                 }
+                'Test' { return $false } # the property is incorrect
+            }
+        }
+
+        # process the icon name
+        $iconReferencePath = $StockIconName | Get-StockIconReferencePath
+        if ( $library.IconReferencePath -ne $iconReferencePath )
+        {
+            switch ( $Mode )
+            {
+                'Set' {
+                    # correct the property
+                    $library | Set-ShellLibraryProperty IconReferencePath $iconReferencePath
+                }
+                'Test' { return $false } # the property is incorrect
             }
         }
 
