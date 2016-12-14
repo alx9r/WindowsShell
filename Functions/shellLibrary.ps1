@@ -73,10 +73,19 @@ function Get-ShellLibrary
         }
 
         # the library exists
-        $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($Name,$false)
-        $r = Convert-ShellLibraryObject $l
-        $l.Dispose()
-        return $r
+        try
+        {
+            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($Name,$true)
+            $r = Convert-ShellLibraryObject $l
+            return $r
+        }
+        finally
+        {
+            if ( $null -ne $l )
+            {
+                $l.Dispose()
+            }
+        }
     }
 }
 
@@ -162,7 +171,25 @@ function Set-ShellLibraryType
     )
     process
     {
-        throw [System.NotImplementedException]::new('Set-ShellLibraryType')
+        if ( -not ( $Name | Test-ShellLibrary ) )
+        {
+            # the library doesn't exist
+            throw [System.Management.Automation.ItemNotFoundException]::new(
+                "library named $Name not found"
+            )
+        }
+        try
+        {
+            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($Name,$false)
+            $l.LibraryType = $TypeName
+        }
+        finally
+        {
+            if ( $null -ne $l )
+            {
+                $l.Dispose()
+            }
+        }
     }
 }
 
