@@ -1,19 +1,3 @@
-function Remove-ShellLibrary
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true,
-                   ValueFromPipeline = $true)]
-        [string]
-        $Name
-    )
-    process
-    {
-        throw [System.NotImplementedException]::new('Remove-ShellLibrary')
-    }
-}
-
 function Get-ShellLibrary
 {
     [CmdletBinding()]
@@ -26,7 +10,14 @@ function Get-ShellLibrary
     )
     process
     {
-        throw [System.NotImplementedException]::new('Get-ShellLibrary')
+        $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($Name,$false)
+        $r = New-Object ShellLibrary -Property @{
+            Name     = $l.Name
+            TypeName = $l.LibraryType
+            IconReferencePath = $l.IconResourceId.ReferencePath
+        }
+        $l.Dispose()
+        return $r
     }
 }
 
@@ -42,6 +33,22 @@ function Add-ShellLibrary
     process
     {
         throw [System.NotImplementedException]::new('New-ShellLibrary')
+    }
+}
+
+function Remove-ShellLibrary
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true)]
+        [string]
+        $Name
+    )
+    process
+    {
+        throw [System.NotImplementedException]::new('Remove-ShellLibrary')
     }
 }
 
