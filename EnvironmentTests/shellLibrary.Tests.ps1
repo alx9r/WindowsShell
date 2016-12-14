@@ -94,6 +94,17 @@ Describe "ShellLibrary" {
         }
     }
     Context 'icon' {
+        It 'get the library''s icon' {
+            try
+            {
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                $l.IconResourceId.ReferencePath | Should beNullOrEmpty
+            }
+            finally
+            {
+                $l.Dispose()
+            }
+        }
         It 'set the new library''s icon' {
             try
             {
