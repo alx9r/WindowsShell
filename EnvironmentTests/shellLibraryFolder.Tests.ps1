@@ -111,7 +111,7 @@ Describe 'ShellLibrary folder' {
             finally
             {
                 if ( $f ) { $f.Dispose() }
-                if ( $f ) { $l.Dispose() }
+                if ( $l ) { $l.Dispose() }
             }
         }
         It 'remove the folder' {
