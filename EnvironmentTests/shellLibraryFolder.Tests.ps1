@@ -259,12 +259,27 @@ Describe 'ShellLibrary folder' {
                     $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
                     $r = $l | ? { $_.Path -eq $folderPath }
                     $r.Path | Should be $folderPath
+                    $r.GetType() | Should be 'Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder'
                 }
                 finally
                 {
                     $l.Dispose()
                     $r.Dispose()
                 }                
+            }
+            It 'remove succeeds' {
+                try
+                {
+                    $f = [Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder]::FromFolderPath($folderPath)
+                    $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
+                    $r = $l.Remove($f)
+                    $r | Should be $true
+                }
+                finally
+                {
+                    $f.Dispose()
+                    $l.Dispose()
+                }
             }
         }
     }
