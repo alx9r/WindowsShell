@@ -57,7 +57,8 @@ function Invoke-ProcessShellLibrary
         [ValidateSet('Present','Absent')]
         $Ensure = 'Present',
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true,
+                   Position = 3)]
         [ValidateScript({ $_ | Test-ValidShellLibraryName })]
         [string]
         $Name,
@@ -112,7 +113,11 @@ function Invoke-ProcessShellLibrary
         }
 
         # process library type
-        if ( $library.TypeName -ne $TypeName )
+        if 
+        (
+            'TypeName' -in $PSBoundParameters.Keys -and
+            $library.TypeName -ne $TypeName
+        )
         {
             switch ( $Mode )
             {
@@ -125,16 +130,19 @@ function Invoke-ProcessShellLibrary
         }
 
         # process the icon name
-        $iconReferencePath = $StockIconName | Get-StockIconReferencePath
-        if ( $library.IconReferencePath -ne $iconReferencePath )
+        if ( 'StockIconName' -in $PSBoundParameters.Keys )
         {
-            switch ( $Mode )
+            $iconReferencePath = $StockIconName | Get-StockIconReferencePath
+            if ( $library.IconReferencePath -ne $iconReferencePath )
             {
-                'Set' {
-                    # correct the property
-                    $library | Set-ShellLibraryProperty IconReferencePath $iconReferencePath
+                switch ( $Mode )
+                {
+                    'Set' {
+                        # correct the property
+                        $library | Set-ShellLibraryProperty IconReferencePath $iconReferencePath
+                    }
+                    'Test' { return $false } # the property is incorrect
                 }
-                'Test' { return $false } # the property is incorrect
             }
         }
 

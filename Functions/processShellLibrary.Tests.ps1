@@ -45,7 +45,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             'C:\WINDOWS\system32\imageres.dll,-152'
         } -Verifiable
         Mock Set-ShellLibraryProperty -Verifiable
-        Context 'not present, Set' {
+        Context 'absent, Set' {
             Mock Add-ShellLibrary {
                 New-Object ShellLibrary -Property @{
                     Name = 'libary name'
@@ -77,7 +77,25 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
                 }
             }
         }
-        Context 'not present, Test' {
+        Context 'omit optional properties' {
+            Mock Add-ShellLibrary {
+                New-Object ShellLibrary -Property @{
+                    Name = 'libary name'
+                }
+            } -Verifiable
+            It 'returns nothing' {
+                $r = Invoke-ProcessShellLibrary Set Present 'library name'
+                $r | Should beNullOrEmpty
+            }
+            It 'correctly invokes functions' {
+                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+                Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
+                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly
+                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            }
+        }
+        Context 'absent, Test' {
             It 'returns false' {
                 $splat = @{
                     Name = 'library name'
