@@ -88,10 +88,17 @@ Describe Test-ShellLibraryFolder {
         }
     }
 }
-<#
+
 Describe Add-ShellLibraryFolder {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
-    $libraryName = "Add-ShellLibraryFolder-$guidFrag"    
+    $libraryName = "Add-ShellLibraryFolder-$guidFrag"
+    $folderPath = Join-Path ([System.IO.Path]::GetTempPath()) "folder-$guidFrag"
+    Context 'set up' {
+        It 'create the file system folder' {
+            New-Item $folderPath -ItemType Directory
+            Test-Path $folderPath | Should be $true
+        }
+    }
     Context 'folder doesn''t exist' {
         It 'create the library' {
             Invoke-ProcessShellLibrary Set Present $libraryName
@@ -99,12 +106,55 @@ Describe Add-ShellLibraryFolder {
             $r | Should be $true
         }
         It 'returns nothing' {
-            $r = $libraryName | Add-ShellLibraryFolder 'folder name'
+            $r = $libraryName | Add-ShellLibraryFolder $folderPath
             $r | Should beNullOrEmpty
         }
+        It 'the folder exists' {
+            $r = $libraryName | Test-ShellLibraryFolder $folderPath
+            $r | Should be $true
+        }
     }
-    Context 'folder exists' {}
-    Context 'library doesn''t exist' {}
+    Context 'folder exists' {
+        It 'throws correct exception' {
+            { $libraryName | Add-ShellLibraryFolder $folderPath } |
+                Should throw "folder $folderPath already exists"
+        }
+    }
+    Context 'library doesn''t exist' {
+        It 'throws correct exception' {
+            $libraryName = "NotExists-$guidFrag"
+            { $libraryName | Add-ShellLibraryFolder $folderPath } |
+                Should throw "library named $libraryName does not exist"
+        }
+    }
+    Context 'file system folder does not exist' {
+        It 'remove the file system folder' {
+            Remove-Item $folderPath -Force
+            Test-Path $folderPath | Should be $false
+        }
+        It 're-create the library' {
+            Invoke-ProcessShellLibrary Set Absent $libraryName
+            $r = Invoke-ProcessShellLibrary Test Absent $libraryName
+            $r | Should be $true
+            Invoke-ProcessShellLibrary Set Present $libraryName
+            $r = Invoke-ProcessShellLibrary Test Present $libraryName
+            $r | Should be $true
+        }
+        It 'throws correct exception' {
+            { $libraryName | Add-ShellLibraryFolder $folderPath } |
+                Should throw "folder $folderPath does not exist"
+        }
+    }
+    Context 'item on file system is a file' {
+        It 'create the file' {
+            New-Item $folderPath -ItemType File
+            Test-Path $folderPath -PathType Leaf | Should be $true
+        }
+        It 'throws correct exception' {
+            { $libraryName | Add-ShellLibraryFolder $folderPath } |
+                Should throw "$folderPath is a file"
+        }
+    }
     Context 'clean up' {
         It 'remove the library' {
             Invoke-ProcessShellLibrary Set Absent $libraryName
@@ -112,4 +162,4 @@ Describe Add-ShellLibraryFolder {
             $r | Should be $true
         }
     }
-}#>
+}
