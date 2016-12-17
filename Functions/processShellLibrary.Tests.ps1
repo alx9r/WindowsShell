@@ -47,7 +47,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
         Mock Set-ShellLibraryProperty -Verifiable
         Context 'absent, Set' {
             Mock Add-ShellLibrary {
-                New-Object ShellLibrary -Property @{
+                New-Object ShellLibraryInfo -Property @{
                     Name = 'libary name'
                 }
             } -Verifiable
@@ -79,7 +79,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
         }
         Context 'omit optional properties' {
             Mock Add-ShellLibrary {
-                New-Object ShellLibrary -Property @{
+                New-Object ShellLibraryInfo -Property @{
                     Name = 'libary name'
                 }
             } -Verifiable
@@ -117,7 +117,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
         }
         Context 'present, Set' {
             Mock Get-ShellLibrary {
-                New-Object ShellLibrary -Property @{
+                New-Object ShellLibraryInfo -Property @{
                     Name = 'libary name'
                     TypeName = 'Pictures'
                     IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
@@ -143,7 +143,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
         }
         Context 'present, Test' {
             Mock Get-ShellLibrary {
-                New-Object ShellLibrary -Property @{
+                New-Object ShellLibraryInfo -Property @{
                     Name = 'libary name'
                     TypeName = 'Pictures'
                     IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
@@ -170,7 +170,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
         }
         Context 'present wrong type, Test' {
             Mock Get-ShellLibrary {
-                New-Object ShellLibrary -Property @{
+                New-Object ShellLibraryInfo -Property @{
                     Name = 'libary name'
                     TypeName = 'Pictures'
                     IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
@@ -197,7 +197,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
         }
         Context 'present wrong icon, Test' {
             Mock Get-ShellLibrary {
-                New-Object ShellLibrary -Property @{
+                New-Object ShellLibraryInfo -Property @{
                     Name = 'libary name'
                     TypeName = 'Pictures'
                     IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-94'
@@ -275,7 +275,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
         }
         Context 'present, Set' {
             Mock Get-ShellLibrary {
-                New-Object ShellLibrary -Property @{
+                New-Object ShellLibraryInfo -Property @{
                     Name = 'libary name'
                     TypeName = 'Pictures'
                     IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
@@ -301,7 +301,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
         }
         Context 'present, Test' {
             Mock Get-ShellLibrary {
-                New-Object ShellLibrary -Property @{
+                New-Object ShellLibraryInfo -Property @{
                     Name = 'libary name'
                     TypeName = 'Pictures'
                     IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'

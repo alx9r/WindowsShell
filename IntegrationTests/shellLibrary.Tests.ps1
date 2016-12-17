@@ -23,11 +23,11 @@ Describe Get-ShellLibrary {
                 $l.Dispose()
             }
         }
-        It 'returns exactly one ShellLibrary object' {
+        It 'returns exactly one ShellLibraryInfo object' {
             $r = $libraryName | Get-ShellLibrary
             $r.Count | Should be 1
             $r.Name | Should be $libraryName
-            $r.GetType() | Should be 'ShellLibrary'
+            $r.GetType() | Should be 'ShellLibraryInfo'
         }
         It 'populates library type' {
             $r = $libraryName | Get-ShellLibrary
@@ -54,10 +54,10 @@ Describe Add-ShellLibrary {
     $libraryName = "Add-ShellLibrary-$guidFrag"
     $h = @{}
     Context 'library doesn''t exist' {
-        It 'returns exactly one ShellLibrary object' {
+        It 'returns exactly one ShellLibraryInfo object' {
             $h.L = $libraryName | Add-ShellLibrary
             $h.L.Count | Should be 1
-            $h.L.GetType() | Should be 'ShellLibrary'
+            $h.L.GetType() | Should be 'ShellLibraryInfo'
         }
         It 'type name is empty' {
             $h.L.TypeName | Should beNullOrEmpty

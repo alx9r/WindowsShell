@@ -1,4 +1,4 @@
-class ShellLibrary
+class ShellLibraryInfo
 {
     [string] $Name
     [string] $TypeName

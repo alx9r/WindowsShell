@@ -46,7 +46,7 @@ function Convert-ShellLibraryObject
     )
     process
     {
-        New-Object ShellLibrary -Property @{
+        New-Object ShellLibraryInfo -Property @{
             Name     = $InputObject.Name
             TypeName = $InputObject.LibraryType
             IconReferencePath = $InputObject.IconResourceId.ReferencePath

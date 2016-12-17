@@ -49,28 +49,34 @@ function Invoke-ProcessShellLibrary
     param
     (
         [Parameter(Mandatory = $true,
-                   Position = 1)]
+                   Position = 1,
+                   ValueFromPipelineByPropertyName = $true)]
         [ValidateSet('Set','Test')]
         $Mode,
 
-        [Parameter(Position = 2)]
+        [Parameter(Position = 2,
+                   ValueFromPipelineByPropertyName = $true)]
         [ValidateSet('Present','Absent')]
         $Ensure = 'Present',
 
         [Parameter(Mandatory = $true,
-                   Position = 3)]
+                   Position = 3,
+                   ValueFromPipelineByPropertyName = $true)]
         [ValidateScript({ $_ | Test-ValidShellLibraryName })]
         [string]
         $Name,
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateScript({ $_ | Test-ValidShellLibraryTypeName })]
         [string]
         $TypeName,
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateScript({ $_ | Test-ValidStockIconName })]
         [string]
         $StockIconName,
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [string[]]
         $FolderOrder
     )
