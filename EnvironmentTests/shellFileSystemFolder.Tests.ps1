@@ -1,3 +1,9 @@
+Describe 'set up environment' {
+    It 'add the Windows API Code Pack assembly' {
+        Add-Type -Path "$PSScriptRoot\..\bin\winapicp\Microsoft.WindowsAPICodePack.Shell.dll"
+    }
+}
+
 Describe 'ShellFileSystemFolder' {
     Context 'create folder' {
         $existsPath = "$([System.IO.Path]::GetTempPath())Exists-c04c4e56"
