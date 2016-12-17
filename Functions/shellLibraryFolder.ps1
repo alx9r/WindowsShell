@@ -5,13 +5,13 @@ function Test-ShellLibraryFolder
     (
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
-        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
-        $LibraryName,
+        [ValidateScript({ $_ | Test-ValidFilePath })]
+        $FolderPath,
 
         [Parameter(Mandatory = $true,
                    Position = 1)]
-        [ValidateScript({ $_ | Test-ValidFilePath })]
-        $FolderPath
+        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
+        $LibraryName
     )
     process
     {
@@ -70,13 +70,13 @@ function Add-ShellLibraryFolder
     (
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
-        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
-        $LibraryName,
+        [ValidateScript({ $_ | Test-ValidFilePath })]
+        $FolderPath,
 
         [Parameter(Mandatory = $true,
                    Position = 1)]
-        [ValidateScript({ $_ | Test-ValidFilePath })]
-        $FolderPath
+        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
+        $LibraryName
     )
     process
     {
@@ -88,7 +88,7 @@ function Add-ShellLibraryFolder
             )
         }
 
-        if ( $LibraryName | Test-ShellLibraryFolder $FolderPath )
+        if ( $FolderPath | Test-ShellLibraryFolder $LibraryName )
         {
             # the folder already exists
             throw [System.IO.IOException]::new(
@@ -138,13 +138,13 @@ function Remove-ShellLibraryFolder
     (
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
-        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
-        $LibraryName,
+        [ValidateScript({ $_ | Test-ValidFilePath })]
+        $FolderPath,
 
         [Parameter(Mandatory = $true,
                    Position = 1)]
-        [ValidateScript({ $_ | Test-ValidFilePath })]
-        $FolderPath
+        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
+        $LibraryName
     )
     process
     {
