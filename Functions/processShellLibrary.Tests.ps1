@@ -234,7 +234,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
             'C:\WINDOWS\system32\imageres.dll,-152'
         } -Verifiable
         Mock Set-ShellLibraryProperty -Verifiable
-        Context 'not present, Set' {
+        Context 'absent, Set' {
             It 'returns nothing' {
                 $splat = @{
                     Name = 'library name'
@@ -253,7 +253,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
                 Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
             }
         }
-        Context 'not present, Test' {
+        Context 'absent, Test' {
             It 'returns true' {
                 $splat = @{
                     Name = 'library name'
