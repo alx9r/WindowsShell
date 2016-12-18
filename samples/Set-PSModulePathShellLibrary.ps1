@@ -14,7 +14,8 @@
         }
         ShellLibrary PSModulePath @{ 
             Name = 'PSModulePath' 
-            StockIconName = 'Stack'
+            #StockIconName = 'Stack'
+            IconFilePath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
         }
     }
     $h = @{}

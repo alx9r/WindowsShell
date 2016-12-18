@@ -13,7 +13,11 @@ function Test-ValidShellLibraryTypeName
     process
     {
         $out = New-Object Microsoft.WindowsAPICodePack.Shell.LibraryFolderType
-        if ( -not [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::TryParse($TypeName,[ref]$out) )
+        if
+        (
+            $TypeName -ne 'DoNotSet' -and
+            -not [Microsoft.WindowsAPICodePack.Shell.LibraryFolderType]::TryParse($TypeName,[ref]$out)
+        )
         {
             &(Publish-Failure "$TypeName is not a valid library type name",'TypeName' ([System.ArgumentException]))
             return $false
@@ -34,7 +38,11 @@ function Test-ValidStockIconName
     process
     {
         $out = New-Object Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier
-        if ( -not [Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier]::TryParse($StockIconName,[ref]$out) )
+        if
+        ( 
+            $StockIconName -ne 'DoNotSet' -and
+            -not [Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier]::TryParse($StockIconName,[ref]$out)
+        )
         {
             &(Publish-Failure "$StockIconName is not a valid stock icon name",'IconName' ([System.ArgumentException]))
             return $false
@@ -45,7 +53,7 @@ function Test-ValidStockIconName
 
 function Invoke-ProcessShellLibrary
 {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='StockIcon')]
     param
     (
         [Parameter(Mandatory = $true,
@@ -69,14 +77,20 @@ function Invoke-ProcessShellLibrary
         $Name,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [ValidateScript({ $_ | Test-ValidShellLibraryTypeName })]
         [string]
         $TypeName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [ValidateScript({ $_ | Test-ValidStockIconName })]
         [string]
         $StockIconName,
+
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [string]
+        $IconFilePath,
+
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [int]
+        $IconResourceId=0,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [string[]]
@@ -84,9 +98,13 @@ function Invoke-ProcessShellLibrary
     )
     process
     {
+        # validate parameters
+        $IconFilePath | ? {$_} | Test-ValidFilePath -ea Stop | Out-Null
+        $TypeName | ? {$_} | Test-ValidShellLibraryTypeName -ea Stop | Out-Null
+        $StockIconName | ? {$_} | Test-ValidStockIconName -ea Stop | Out-Null
+        
         # retrieve the library
         $library = $Name | Get-ShellLibrary
-
 
         # process library existence
         switch ( $Ensure )
@@ -123,7 +141,7 @@ function Invoke-ProcessShellLibrary
         # process library type
         if 
         (
-            'TypeName' -in $PSBoundParameters.Keys -and
+            ( $TypeName -ne [string]::Empty -and $TypeName -ne 'DoNotSet' ) -and
             $library.TypeName -ne $TypeName
         )
         {
@@ -138,9 +156,22 @@ function Invoke-ProcessShellLibrary
         }
 
         # process the icon name
-        if ( 'StockIconName' -in $PSBoundParameters.Keys )
+        if
+        ( 
+            ( $StockIconName -ne [string]::Empty -and $StockIconName -ne 'DoNotSet' ) -or
+            $IconFilePath
+        )
         {
-            $iconReferencePath = $StockIconName | Get-StockIconReferencePath
+            # compose the icon reference path
+            if ( $IconFilePath )
+            {
+                $iconReferencePath = "$IconFilePath,$IconResourceId"
+            }
+            else
+            {
+                $iconReferencePath = $StockIconName | Get-StockIconReferencePath
+            }
+
             if ( $library.IconReferencePath -ne $iconReferencePath )
             {
                 switch ( $Mode )

@@ -37,9 +37,30 @@ Describe 'ShellLibrary Resource' {
             $r | Should be $false
         }
     }
-    Context 'icon' {
+    Context 'StockIcon' {
         It 'testing different icon returns false' {
             $h.d.StockIconName = 'Application'
+            $r = $h.d.Test()
+            $r | Should be $false
+        }
+        It 'set different icon' {
+            $h.d.Set()
+        }
+        It 'testing different icon returns true' {
+            $r = $h.d.Test()
+            $r | Should be $true
+        }
+    }
+    Context 'IconFilePath' {
+        It 're-create theh object' {
+            $h.d = (Get-Module WindowsShell).NewBoundScriptBlock({
+                [ShellLibrary]::new()
+            }).InvokeReturnAsIs()
+            $h.d.Name = $libraryName
+        }
+        It 'testing different icon returns false' {
+            $h.d.IconFilePath = 'C:\WINDOWS\system32\imageres.dll'
+            $h.d.IconResourceId = '-152'
             $r = $h.d.Test()
             $r | Should be $false
         }

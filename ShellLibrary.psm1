@@ -11,6 +11,8 @@ enum LibraryTypeName
     Music
     Pictures
     Videos
+
+    DoNotSet
 }
 
 enum StockIconName
@@ -26,6 +28,8 @@ enum StockIconName
     MediaCompactFlash; DeviceCellPhone; DeviceCamera; DeviceVideoCamera; DeviceAudioPlayer; NetworkConnect; Internet; 
     ZipFile; Settings; DriveHDDVD; DriveBluRay; MediaHDDVDROM; MediaHDDVDR; MediaHDDVDRAM; MediaBluRayROM; 
     MediaBluRayR; MediaBluRayRE; ClusteredDisk;
+
+    DoNotSet
 }
 
 [DscResource()]
@@ -41,11 +45,19 @@ class ShellLibrary
 
     [DscProperty()]
     [LibraryTypeName]
-    $TypeName
+    $TypeName = [LibraryTypeName]::DoNotSet
 
     [DscProperty()]
     [StockIconName]
-    $StockIconName
+    $StockIconName = [StockIconName]::DoNotSet
+
+    [DscProperty()]
+    [string]
+    $IconFilePath
+
+    [DscProperty()]
+    [int]
+    $IconResourceId
 
     [void] Set() { $this | Invoke-ProcessShellLibrary Set }
     [bool] Test() { return $this | Invoke-ProcessShellLibrary Test }

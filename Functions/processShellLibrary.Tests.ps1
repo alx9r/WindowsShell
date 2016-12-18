@@ -11,6 +11,10 @@ Describe Test-ValidShellLibraryTypeName {
         $r = 'Pictures' | Test-ValidShellLibraryTypeName
         $r | Should be $true
     }
+    It 'returns true for DoNotSet' {
+        $r = 'DoNotSet' | Test-ValidShellLibraryTypeName
+        $r | Should be $true
+    }
     It 'returns false for invalid name' {
         $r = 'Invalid Type Name' | Test-ValidShellLibraryTypeName
         $r | Should be $false
@@ -24,6 +28,10 @@ Describe Test-ValidShellLibraryTypeName {
 Describe Test-ValidStockIconName {
     It 'returns true for valid name' {
         $r = 'Application' | Test-ValidStockIconName
+        $r | Should be $true
+    }
+    It 'returns true for DoNotSet' {
+        $r = 'DoNotSet' | Test-ValidStockIconName
         $r | Should be $true
     }
     It 'returns false for invalid name' {
@@ -47,17 +55,17 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
         Mock Set-ShellLibraryProperty -Verifiable
         Context 'absent, Set' {
             Mock Add-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
+                New-Object ShellLibrary -Property @{
                     Name = 'libary name'
                 }
             } -Verifiable
             It 'returns nothing' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Pictures'
                     StockIconName = 'Application'
                 }
-                $r = Invoke-ProcessShellLibrary Set @splat
+                $r = $object | Invoke-ProcessShellLibrary Set
                 $r | Should beNullOrEmpty
             }
             It 'correctly invokes functions' {
@@ -75,6 +83,89 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
                     $PropertyName -eq 'IconReferencePath' -and
                     $Value -eq 'C:\WINDOWS\system32\imageres.dll,-152'
                 }
+            }
+        }
+        Context 'IconFilePath' {
+            Mock Add-ShellLibrary {
+                New-Object ShellLibraryInfo -Property @{
+                    Name = 'libary name'
+                }
+            } -Verifiable
+            It 'returns nothing' {
+                $object = New-Object ShellLibrary -Property @{
+                    Name = 'library name'
+                    TypeName = 'Pictures'
+                    IconFilePath = 'c:\folder\some.exe'
+                    IconResourceId = 0
+                }
+                $r = $object | Invoke-ProcessShellLibrary Set
+                $r | Should beNullOrEmpty
+            }
+            It 'correctly invokes functions' {
+                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+                Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
+                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+                Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                    $PropertyName -eq 'TypeName' -and
+                    $Value -eq 'Pictures'
+                }
+                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+                Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                    $PropertyName -eq 'IconReferencePath' -and
+                    $Value -eq 'C:\folder\some.exe,0'
+                }
+            }            
+        }
+        Context 'StockIcon and IconFilePath' {
+            Mock Add-ShellLibrary {
+                New-Object ShellLibraryInfo -Property @{
+                    Name = 'libary name'
+                }
+            } -Verifiable
+            It 'returns nothing' {
+                $object = New-Object ShellLibrary -Property @{
+                    Name = 'library name'
+                    TypeName = 'Pictures'
+                    StockIconName = 'Application'
+                    IconFilePath = 'c:\folder\some.exe'
+                }
+                $r = $object | Invoke-ProcessShellLibrary Set
+                $r | Should beNullOrEmpty
+            }
+            It 'correctly invokes functions' {
+                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+                Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
+                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+                Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                    $PropertyName -eq 'TypeName' -and
+                    $Value -eq 'Pictures'
+                }
+                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+                Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                    $PropertyName -eq 'IconReferencePath' -and
+                    $Value -eq 'C:\folder\some.exe,0'
+                }
+            }
+        }
+        Context 'null optional properties' {
+            Mock Add-ShellLibrary {
+                New-Object ShellLibraryInfo -Property @{
+                    Name = 'libary name'
+                }
+            } -Verifiable
+            It 'returns nothing' {
+                $object = New-Object ShellLibrary -Property @{
+                    Name = 'library name'
+                }
+                $r = $object | Invoke-ProcessShellLibrary Set
+                $r | Should beNullOrEmpty
+            }
+            It 'correctly invokes functions' {
+                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+                Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
+                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly
+                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
             }
         }
         Context 'omit optional properties' {
@@ -97,12 +188,12 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
         }
         Context 'absent, Test' {
             It 'returns false' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Pictures'
                     StockIconName = 'Application'
                 }
-                $r = Invoke-ProcessShellLibrary Test @splat
+                $r = $object | Invoke-ProcessShellLibrary Test
                 $r.Count | Should be 1
                 $r | Should be $false
             }
@@ -124,12 +215,12 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
                 }
             } -Verifiable
             It 'returns nothing' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Pictures'
                     StockIconName = 'Application'
                 }
-                $r = Invoke-ProcessShellLibrary Set @splat
+                $r = $object | Invoke-ProcessShellLibrary Set
                 $r | Should beNullOrEmpty
             }
             It 'correctly invokes functions' {
@@ -150,12 +241,12 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
                 }
             } -Verifiable
             It 'returns true' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Pictures'
                     StockIconName = 'Application'
                 }
-                $r = Invoke-ProcessShellLibrary Test @splat
+                $r = $object | Invoke-ProcessShellLibrary Test
                 $r.Count | Should be 1
                 $r | Should be $true
             }
@@ -177,12 +268,12 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
                 }
             } -Verifiable
             It 'returns false' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Music'
                     StockIconName = 'Application'
                 }
-                $r = Invoke-ProcessShellLibrary Test @splat
+                $r = $object | Invoke-ProcessShellLibrary Test
                 $r.Count | Should be 1
                 $r | Should be $false
             }
@@ -204,12 +295,12 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
                 }
             } -Verifiable
             It 'returns false' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Pictures'
                     StockIconName = 'Application'
                 }
-                $r = Invoke-ProcessShellLibrary Test @splat
+                $r = $object | Invoke-ProcessShellLibrary Test
                 $r.Count | Should be 1
                 $r | Should be $false
             }
@@ -236,12 +327,13 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
         Mock Set-ShellLibraryProperty -Verifiable
         Context 'absent, Set' {
             It 'returns nothing' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Pictures'
                     StockIconName = 'Application'
+                    Ensure = 'Absent'
                 }
-                $r = Invoke-ProcessShellLibrary Set Absent @splat
+                $r = $object | Invoke-ProcessShellLibrary Set
                 $r | Should beNullOrEmpty
             }
             It 'correctly invokes functions' {
@@ -255,12 +347,13 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
         }
         Context 'absent, Test' {
             It 'returns true' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Pictures'
                     StockIconName = 'Application'
+                    Ensure = 'Absent'
                 }
-                $r = Invoke-ProcessShellLibrary Test Absent @splat
+                $r = $object | Invoke-ProcessShellLibrary Test
                 $r.Count | Should be 1
                 $r | Should be $true
             }
@@ -282,12 +375,13 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
                 }
             } -Verifiable
             It 'returns nothing' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Pictures'
                     StockIconName = 'Application'
+                    Ensure = 'Absent'
                 }
-                $r = Invoke-ProcessShellLibrary Set Absent @splat
+                $r = $object | Invoke-ProcessShellLibrary Set
                 $r | Should beNullOrEmpty
             }
             It 'correctly invokes functions' {
@@ -308,12 +402,13 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
                 }
             } -Verifiable
             It 'returns false' {
-                $splat = @{
+                $object = New-Object ShellLibrary -Property @{
                     Name = 'library name'
                     TypeName = 'Pictures'
                     StockIconName = 'Application'
+                    Ensure = 'Absent'
                 }
-                $r = Invoke-ProcessShellLibrary Test Absent @splat
+                $r = $object | Invoke-ProcessShellLibrary Test
                 $r.Count | Should be 1
                 $r | Should be $false
             }
