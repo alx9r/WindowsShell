@@ -9,18 +9,30 @@ class ShellLibraryFolder
 {
     [DscProperty(Key)]
     [string]
-    $FolderPath
-
-    [DscProperty(Key)]
-    [string]
     $LibraryName
+
+    [DscProperty(Mandatory)]
+    [string[]]
+    $FolderPath
 
     [DscProperty()]
     [Ensure]
     $Ensure
 
-    [void] Set() { $this | Invoke-ProcessShellLibraryFolder Set }
-    [bool] Test() { return $this | Invoke-ProcessShellLibraryFolder Test }
+    [void] Set()
+    {
+        $this.FolderPath | 
+            Invoke-ProcessShellLibraryFolder Set  $this.Ensure $this.LibraryName
+    }
+    [bool] Test()
+    {
+        $numSucceeded = $this.FolderPath |
+            Invoke-ProcessShellLibraryFolder Test $this.Ensure $this.LibraryName |
+            ? { $_ -eq $true } |
+            Measure-Object |
+            % Count
+        return $numSucceeded -eq $this.FolderPath.Count
+    }
 
     [ShellLibraryFolder] Get() { return $this }
 } 

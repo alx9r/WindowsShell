@@ -32,7 +32,7 @@ function Test-ShellLibraryFolder
                 # search through the list of folders
                 foreach ( $folder in $l.GetEnumerator() )
                 {
-                    if ( $folder.Path -eq $FolderPath )
+                    if ( Test-FolderPathsAreEqual $folder.Path $FolderPath )
                     {
                         # the folder exists
                         return $true
@@ -44,7 +44,9 @@ function Test-ShellLibraryFolder
             }
             
             # create a reference to the file system folder that the library understands
-            $f = [Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder]::FromFolderPath($FolderPath)
+            $f = [Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder]::FromFolderPath((
+                $FolderPath | ConvertTo-WindowsShellFolderPathFormat
+            ))
 
             if ( -not $l.Contains($f) )
             {
@@ -118,7 +120,9 @@ function Add-ShellLibraryFolder
             $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($LibraryName,$false)
 
             # create a reference to the file system folder that the library understands
-            $f = [Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder]::FromFolderPath($FolderPath)
+            $f = [Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder]::FromFolderPath((
+                $FolderPath | ConvertTo-WindowsShellFolderPathFormat
+            ))
 
             # add the folder
             $l.Add($f)
@@ -167,7 +171,7 @@ function Remove-ShellLibraryFolder
                 # search through the list of folders
                 foreach ( $f in $l.GetEnumerator() )
                 {
-                    if ( $f.Path -eq $FolderPath )
+                    if ( Test-FolderPathsAreEqual $f.Path $FolderPath )
                     {
                         # the folder exists, remove it
                         $l.Remove($f) | Out-Null
@@ -182,7 +186,9 @@ function Remove-ShellLibraryFolder
             }
 
             # create a reference to the file system folder that the library understands
-            $f = [Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder]::FromFolderPath($FolderPath)
+            $f = [Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder]::FromFolderPath((
+                $FolderPath | ConvertTo-WindowsShellFolderPathFormat
+            ))
 
             if ( -not $l.Contains($f) )
             {

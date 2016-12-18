@@ -4,7 +4,8 @@ Import-Module PSDesiredStateConfiguration
 Describe 'ShellLibraryFolder Resource' {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
     $libraryName = "FolderResource-$guidFrag"
-    $folderPath = Join-Path ([System.IO.Path]::GetTempPath()) "Folder-$guidFrag"
+    $folderPath1 = Join-Path ([System.IO.Path]::GetTempPath()) "Folder1-$guidFrag"
+    $folderPath2 = Join-Path ([System.IO.Path]::GetTempPath()) "Folder2-$guidFrag"
     $h = @{}
     It 'is available using Get-DscResource' {
         $r = Get-DscResource ShellLibraryFolder WindowsShell
@@ -16,9 +17,9 @@ Describe 'ShellLibraryFolder Resource' {
                 [ShellLibraryFolder]::new()
             }).InvokeReturnAsIs()
         }
-        It 'create file system folder' {
-            New-Item $folderPath -ItemType Directory -ea Stop
-            Test-Path $folderPath -PathType Container | Should be $true
+        It 'create file system folders' {
+            $folderPath1,$folderPath2 | % { New-Item $_ -ItemType Directory -ea Stop }
+            $folderPath1,$folderPath2 | Test-Path -PathType Container | Should be $true
         }
         It 'create the library' {
             $libraryName | Invoke-ProcessShellLibrary Set
@@ -29,7 +30,31 @@ Describe 'ShellLibraryFolder Resource' {
     Context 'test, create, test, remove, test' {
         It 'test returns false' {
             $h.d.LibraryName = $libraryName
-            $h.d.FolderPath = $folderPath
+            $h.d.FolderPath = $folderPath1
+            $r = $h.d.Test()
+            $r | Should be $false
+        }
+        It 'create' {
+            $h.d.Set()
+        }
+        It 'test returns true' {
+            $r = $h.d.Test()
+            $r | Should be $true
+        }
+        It 'remove' {
+            $h.d.Ensure = 'Absent'
+            $r = $h.d.Set()
+        }
+        It 'test returns false' {
+            $h.d.Ensure = 'Present'
+            $r = $h.d.Test()
+            $r | Should be $false
+        }
+    }
+    Context 'multiple folders' {
+        It 'test returns false' {
+            $h.d.LibraryName = $libraryName
+            $h.d.FolderPath = $folderPath1,$folderPath2
             $r = $h.d.Test()
             $r | Should be $false
         }
@@ -52,8 +77,8 @@ Describe 'ShellLibraryFolder Resource' {
     }
     Context 'clean up' {
         It 'remove the file system folder' {
-            Remove-Item $folderPath -ea Stop
-            Test-Path $folderPath | Should be $false
+            Remove-Item $folderPath1 -ea Stop
+            Test-Path $folderPath1 | Should be $false
         }
         It 'remove the library' {
             $libraryName | Invoke-ProcessShellLibrary Set Absent
