@@ -3,27 +3,32 @@ function Invoke-ProcessShellLibraryFolder
     [CmdletBinding()]
     param
     (
-
         [Parameter(Mandatory = $true,
-                   ValueFromPipeline = $true)]
-        [ValidateScript({ $_ | Test-ValidFilePath })]
-        [string]
-        $FolderPath,
-
-        [Parameter(Mandatory = $true,
-                   Position = 1)]
+                   Position = 1,
+                   ValueFromPipelineByPropertyName = $true)]
         [ValidateSet('Set','Test')]
         $Mode,
 
-        [Parameter(Position = 2)]
+        [Parameter(Position = 2,
+                   ValueFromPipelineByPropertyName = $true)]
         [ValidateSet('Present','Absent')]
         $Ensure = 'Present',
 
         [Parameter(Mandatory = $true,
-                   Position = 3)]
+                   Position = 3,
+                   ValueFromPipelineByPropertyName = $true)]
         [ValidateScript({ $_ | Test-ValidShellLibraryName })]
+        [Alias('Name')]
         [string]
-        $LibraryName
+        $LibraryName,
+
+        [Parameter(Mandatory = $true,
+                   Position = 4,
+                   ValueFromPipeline = $true,
+                   ValueFromPipelineByPropertyName = $true)]
+        [ValidateScript({ $_ | Test-ValidFilePath })]
+        [string]
+        $FolderPath
     )
     process
     {

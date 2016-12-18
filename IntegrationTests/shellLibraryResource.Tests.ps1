@@ -3,7 +3,7 @@ Import-Module PSDesiredStateConfiguration
 
 Describe 'ShellLibrary Resource' {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
-    $libraryName = "Resource-$guidFrag"
+    $libraryName = "LibraryResource-$guidFrag"
     $h = @{}
     It 'is available using Get-DscResource' {
         $r = Get-DscResource ShellLibrary WindowsShell

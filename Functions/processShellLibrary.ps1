@@ -61,8 +61,10 @@ function Invoke-ProcessShellLibrary
 
         [Parameter(Mandatory = $true,
                    Position = 3,
+                   ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
         [ValidateScript({ $_ | Test-ValidShellLibraryName })]
+        [Alias('LibraryName')]
         [string]
         $Name,
 
