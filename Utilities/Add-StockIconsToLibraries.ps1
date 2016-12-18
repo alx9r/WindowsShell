@@ -1,3 +1,6 @@
+Import-Module WindowsShell
+
+InModuleScope WindowsShell {
 Describe 'add stock icons to libraries' {
     $guidFrag = '8ecdff81'
     It 'add the Windows API Code Pack assembly' {
@@ -9,7 +12,7 @@ Describe 'add stock icons to libraries' {
             $h = @{}
             $libraryName = "$value-$guidFrag"
             It 'get the IconRefPath' {
-                $h.RefPath = [PInvoker.PInvoker]::GetIconRefPath([int]$value)
+                $h.RefPath = [StockIconInfo.StockIconInfo]::GetIconRefPath([int]$value)
             }
             It 'create the library' {
                 $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$true)
@@ -29,4 +32,5 @@ Describe 'add stock icons to libraries' {
             }
         }
     }
+}
 }

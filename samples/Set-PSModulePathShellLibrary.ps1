@@ -1,18 +1,21 @@
 ﻿Describe 'Create PSModulePath Shell Library' {
     $document = {
         Get-DscResource -Module WindowsShell | Import-DscResource
-        ShellLibraryFolder AllPSModulePathFolders @{
+        ShellLibraryFolder Wanted @{
             LibraryName = 'PSModulePath'
             FolderPath = $env:PSModulePath.Split(';') | ? { $_ -notmatch 'Application Virtualization' }
             DependsOn = '[ShellLibrary]PSModulePath'
         }
-        ShellLibraryFolder NoAppV @{
+        ShellLibraryFolder Unwanted @{
             Ensure = 'Absent'
             LibraryName = 'PSModulePath'
             FolderPath = $env:PSModulePath.Split(';') | ? { $_ -match 'Application Virtualization' }
             DependsOn = '[ShellLibrary]PSModulePath'
         }
-        ShellLibrary PSModulePath @{ Name = 'PSModulePath' }
+        ShellLibrary PSModulePath @{ 
+            Name = 'PSModulePath' 
+            StockIconName = 'Stack'
+        }
     }
     $h = @{}
     It 'create instructions' {
