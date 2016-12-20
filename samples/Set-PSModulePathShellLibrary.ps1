@@ -1,23 +1,36 @@
-﻿Describe 'Create PSModulePath Shell Library' {
-    $document = {
-        Get-DscResource -Module WindowsShell | Import-DscResource
-        ShellLibraryFolder Wanted @{
+﻿$document = {
+    Get-DscResource -Module WindowsShell | Import-DscResource
+
+    $wantedFolderPaths = $env:PSModulePath.Split(';') |
+        ? { $_ -notmatch 'Application Virtualization' }
+    $unwantedFolderPaths = $env:PSModulePath.Split(';') |
+        ? { $_ -match 'Application Virtualization' }
+
+    foreach ( $folderPath in $wantedFolderPaths )
+    {
+        ShellLibraryFolder ($folderPath -replace '[^a-zA-Z0-9]','-') @{
             LibraryName = 'PSModulePath'
-            FolderPath = $env:PSModulePath.Split(';') | ? { $_ -notmatch 'Application Virtualization' }
+            FolderPath = $folderPath
             DependsOn = '[ShellLibrary]PSModulePath'
-        }
-        ShellLibraryFolder Unwanted @{
-            Ensure = 'Absent'
-            LibraryName = 'PSModulePath'
-            FolderPath = $env:PSModulePath.Split(';') | ? { $_ -match 'Application Virtualization' }
-            DependsOn = '[ShellLibrary]PSModulePath'
-        }
-        ShellLibrary PSModulePath @{ 
-            Name = 'PSModulePath' 
-            #StockIconName = 'Stack'
-            IconFilePath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
         }
     }
+
+    foreach ( $folderPath in $unwantedFolderPaths )
+    {
+        ShellLibraryFolder ($folderPath -replace '[^a-zA-Z0-9]','-') @{
+            Ensure = 'Absent'
+            LibraryName = 'PSModulePath'
+            FolderPath = $folderPath
+            DependsOn = '[ShellLibrary]PSModulePath'
+        }
+    }
+    ShellLibrary PSModulePath @{ 
+        Name = 'PSModulePath' 
+        IconFilePath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+    }
+}
+
+Describe 'Create PSModulePath Shell Library' {
     $h = @{}
     It 'create instructions' {
         $h.i = ConfigInstructions PSModulePath $document
