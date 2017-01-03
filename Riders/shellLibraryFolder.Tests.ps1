@@ -6,7 +6,14 @@ Describe 'set up environment' {
 Describe 'ShellLibrary folder' {
     $libraryName = "Folders-8e6ae476"
     It 'create a ShellLibrary' {
-        [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$true)
+        try
+        {
+            $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$true)
+        }
+        finally
+        {
+            $l.Dispose()
+        }
     }
     Context 'add and remove string, and list pipeline' {
         It 'add a folder' {
