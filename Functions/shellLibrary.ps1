@@ -16,7 +16,7 @@ function Get-ShellLibraryPath
         )
         $libraryPath = [System.IO.Path]::Combine($librariesPath, $Name)
         return [System.IO.Path]::ChangeExtension($libraryPath, "library-ms")
-    }    
+    }
 }
 
 function Test-ShellLibrary

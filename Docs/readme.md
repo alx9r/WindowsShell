@@ -9,7 +9,7 @@ WindowsShell is a PowerShell module.  To install simply put the root folder (the
 
 ### Prerequisites
 
-ZeroDSC requires WMF 5.0.
+WindowsShell requires WMF 5.0 or later.
 
 ### Obtaining WindowsShell
 

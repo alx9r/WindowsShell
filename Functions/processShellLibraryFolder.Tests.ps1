@@ -145,7 +145,7 @@ Describe 'Invoke-ProcessShellLibraryFolder -Ensure Absent' {
                     $LibraryName -eq 'library name' -and
                     $FolderPath -eq 'c:\folder'
                 }
-            }        
+            }
         }
         Context 'present, Test' {
             Mock Test-ShellLibraryFolder { $true } -Verifiable

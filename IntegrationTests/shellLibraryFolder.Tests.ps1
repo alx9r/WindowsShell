@@ -25,7 +25,7 @@ Describe Test-ShellLibraryFolder {
     }
     Context 'folder doesn''t exist' {
         It 'returns false' {
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $false
         }
     }
@@ -44,7 +44,7 @@ Describe Test-ShellLibraryFolder {
             }
         }
         It 'returns true' {
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $true
         }
     }
@@ -54,7 +54,7 @@ Describe Test-ShellLibraryFolder {
             Test-Path $folderPath | Should be $false
         }
         It 'returns true' {
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $true
         }
     }
@@ -64,7 +64,7 @@ Describe Test-ShellLibraryFolder {
             Test-Path $folderPath -PathType Leaf | Should be $true
         }
         It 'returns true' {
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $true
         }
     }
@@ -74,7 +74,7 @@ Describe Test-ShellLibraryFolder {
             Test-Path $folderPath | Should be $false
         }
         It 'returns false' {
-            $r = 'c:\c41f5bdb-478a-40d1-9589-b26cf35e1b33' | Test-ShellLibraryFolder $libraryName 
+            $r = 'c:\c41f5bdb-478a-40d1-9589-b26cf35e1b33' | Test-ShellLibraryFolder $libraryName
             $r | Should be $false
         }
     }
@@ -85,8 +85,8 @@ Describe Test-ShellLibraryFolder {
             $r | Should be $true
         }
         It 'returns false' {
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
-            $r | Should be $false            
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
+            $r | Should be $false
         }
     }
 }
@@ -112,7 +112,7 @@ Describe Add-ShellLibraryFolder {
             $r | Should beNullOrEmpty
         }
         It 'the folder exists' {
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $true
         }
     }
@@ -192,7 +192,7 @@ Describe Remove-ShellLibraryFolder {
     Context 'folder exists' {
         It 'create the folder' {
             $folderPath | Add-ShellLibraryFolder $libraryName
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $true
         }
         It 'returns nothing' {
@@ -200,7 +200,7 @@ Describe Remove-ShellLibraryFolder {
             $r | Should beNullOrEmpty
         }
         It 'the folder does not exist' {
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $false
         }
     }
@@ -228,7 +228,7 @@ Describe Remove-ShellLibraryFolder {
         }
         It 'add the folder' {
             $folderPath | Add-ShellLibraryFolder $libraryName
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $true
         }
         It 'remove the file system folder' {
@@ -240,7 +240,7 @@ Describe Remove-ShellLibraryFolder {
             $r | Should beNullOrEmpty
         }
         It 'the folder does not exist' {
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $false
         }
     }
@@ -251,7 +251,7 @@ Describe Remove-ShellLibraryFolder {
         }
         It 'add the folder' {
             $folderPath | Add-ShellLibraryFolder $libraryName
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $true
         }
         It 'remove the file system folder...' {
@@ -267,7 +267,7 @@ Describe Remove-ShellLibraryFolder {
             $r | Should beNullOrEmpty
         }
         It 'the folder does not exist' {
-            $r = $folderPath | Test-ShellLibraryFolder $libraryName 
+            $r = $folderPath | Test-ShellLibraryFolder $libraryName
             $r | Should be $false
         }
     }

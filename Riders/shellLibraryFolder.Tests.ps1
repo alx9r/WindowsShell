@@ -152,7 +152,7 @@ Describe 'ShellLibrary folder' {
         It 'IndexOf() returns -1 for folder' {
             try
             {
-                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)        
+                $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
                 $f = [Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder]::FromFolderPath($PSScriptRoot)
                 $i = $l.IndexOf($f)
                 $i | Should be -1
@@ -272,7 +272,7 @@ Describe 'ShellLibrary folder' {
                 {
                     $l.Dispose()
                     $r.Dispose()
-                }                
+                }
             }
             It 'remove succeeds' {
                 try
@@ -385,7 +385,7 @@ Describe 'ShellLibrary folder' {
                 $l | % { $stack.Push($_) }
                 $l.Dispose()
                 $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::new($libraryName,$true)
-                $stack | % { 
+                $stack | % {
                     $l.Add($_)
                     $_.Dispose()
                 }

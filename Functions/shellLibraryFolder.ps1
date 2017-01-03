@@ -42,7 +42,7 @@ function Test-ShellLibraryFolder
                 # the folder does not exist
                 return $false
             }
-            
+
             # create a reference to the file system folder that the library understands
             $f = [Microsoft.WindowsAPICodePack.Shell.ShellFileSystemFolder]::FromFolderPath((
                 $FolderPath | ConvertTo-WindowsShellFolderPathFormat
@@ -207,4 +207,3 @@ function Remove-ShellLibraryFolder
         }
     }
 }
-

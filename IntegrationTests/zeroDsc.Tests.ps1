@@ -38,7 +38,7 @@ Describe 'Invoke with ZeroDsc' {
     Context ShellLibraryFolder {
         $document = [scriptblock]::Create(@"
             Get-DscResource ShellLibraryFolder WindowsShell | Import-DscResource
-            ShellLibraryFolder MyDir @{ 
+            ShellLibraryFolder MyDir @{
                 LibraryName = '$libraryName1'
                 FolderPath = '$folderPath'
             }

@@ -73,14 +73,14 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
             Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
             Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+            Assert-MockCalled Set-ShellLibraryProperty 1 {
                 $PropertyName -eq 'TypeName' -and
                 $Value -eq 'Pictures'
             }
             Assert-MockCalled Get-StockIconReferencePath 1 {
                 $StockIconName -eq 'Application'
             }
-            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+            Assert-MockCalled Set-ShellLibraryProperty 1 {
                 $PropertyName -eq 'IconReferencePath' -and
                 $Value -eq 'C:\WINDOWS\system32\imageres.dll,-152'
             }
@@ -106,16 +106,16 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
             Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
             Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+            Assert-MockCalled Set-ShellLibraryProperty 1 {
                 $PropertyName -eq 'TypeName' -and
                 $Value -eq 'Pictures'
             }
             Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+            Assert-MockCalled Set-ShellLibraryProperty 1 {
                 $PropertyName -eq 'IconReferencePath' -and
                 $Value -eq 'C:\folder\some.exe,0'
             }
-        }            
+        }
     }
     Context 'StockIcon and IconFilePath' {
         Mock Add-ShellLibrary {
@@ -137,12 +137,12 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
             Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
             Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+            Assert-MockCalled Set-ShellLibraryProperty 1 {
                 $PropertyName -eq 'TypeName' -and
                 $Value -eq 'Pictures'
             }
             Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+            Assert-MockCalled Set-ShellLibraryProperty 1 {
                 $PropertyName -eq 'IconReferencePath' -and
                 $Value -eq 'C:\folder\some.exe,0'
             }

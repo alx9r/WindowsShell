@@ -62,4 +62,3 @@ Describe 'P/Invoke SHGetStockIconInfo' {
         $r | Should be 'C:\WINDOWS\system32\imageres.dll,-152'
     }
 }
-

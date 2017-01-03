@@ -39,7 +39,7 @@ function Test-ValidStockIconName
     {
         $out = New-Object Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier
         if
-        ( 
+        (
             $StockIconName -ne 'DoNotSet' -and
             -not [Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier]::TryParse($StockIconName,[ref]$out)
         )
@@ -102,7 +102,7 @@ function Invoke-ProcessShellLibrary
         $IconFilePath | ? {$_} | Test-ValidFilePath -ea Stop | Out-Null
         $TypeName | ? {$_} | Test-ValidShellLibraryTypeName -ea Stop | Out-Null
         $StockIconName | ? {$_} | Test-ValidStockIconName -ea Stop | Out-Null
-        
+
         # retrieve the library
         $library = $Name | Get-ShellLibrary
 
@@ -122,7 +122,7 @@ function Invoke-ProcessShellLibrary
             'Absent' {
                 switch ( $Mode )
                 {
-                    'Set'  { 
+                    'Set'  {
                         if ( $library )
                         {
                             # the library exists, remove it
@@ -139,7 +139,7 @@ function Invoke-ProcessShellLibrary
         }
 
         # process library type
-        if 
+        if
         (
             ( $TypeName -ne [string]::Empty -and $TypeName -ne 'DoNotSet' ) -and
             $library.TypeName -ne $TypeName
@@ -157,7 +157,7 @@ function Invoke-ProcessShellLibrary
 
         # process the icon name
         if
-        ( 
+        (
             ( $StockIconName -ne [string]::Empty -and $StockIconName -ne 'DoNotSet' ) -or
             $IconFilePath
         )

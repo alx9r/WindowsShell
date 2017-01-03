@@ -215,7 +215,7 @@ Describe "ShellLibrary" {
             try
             {
                 $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-                $l.LibraryType | Should beNullOrEmpty        
+                $l.LibraryType | Should beNullOrEmpty
             }
             finally
             {
@@ -250,7 +250,7 @@ Describe "ShellLibrary" {
         }
         It 'the library''s type is empty again' {
             $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($libraryName,$false)
-            $l.LibraryType | Should beNullOrEmpty        
+            $l.LibraryType | Should beNullOrEmpty
         }
     }
     Context 'cleanup' {
