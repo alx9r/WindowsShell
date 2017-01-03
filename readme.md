@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/t5dxe0l2nlcbbgtg/branch/master?svg=true&passingText=master%20-%20OK)](https://ci.appveyor.com/project/alx9r/WindowsShell/branch/master)
+
 # WindowsShell
 
 WindowsShell is a PowerShell module for configuring the Window Shell Libraries.
