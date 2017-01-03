@@ -12,8 +12,11 @@ Describe 'ShellLibraryFolder Resource' {
         $r.Name | Should be 'ShellLibraryFolder'
     }
     Context 'set up' {
+        It 'load module' {
+            $h.m = Import-Module "$((Get-Module WindowsShell).ModuleBase)\ShellLibraryFolder.psm1" -PassThru
+        }
         It 'create object' {
-            $h.d = (Get-Module WindowsShell).NewBoundScriptBlock({
+            $h.d = $h.m.NewBoundScriptBlock({
                 [ShellLibraryFolder]::new()
             }).InvokeReturnAsIs()
         }

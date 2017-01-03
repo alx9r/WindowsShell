@@ -9,8 +9,11 @@ Describe 'ShellLibrary Resource' {
         $r = Get-DscResource ShellLibrary WindowsShell
         $r.Name | Should be 'ShellLibrary'
     }
+    It 'load module' {
+        $h.m = Import-Module "$((Get-Module WindowsShell).ModuleBase)\ShellLibrary.psm1" -PassThru
+    }
     It 'create object' {
-        $h.d = (Get-Module WindowsShell).NewBoundScriptBlock({
+        $h.d = $h.m.NewBoundScriptBlock({
             [ShellLibrary]::new()
         }).InvokeReturnAsIs()
     }
@@ -53,7 +56,7 @@ Describe 'ShellLibrary Resource' {
     }
     Context 'IconFilePath' {
         It 're-create theh object' {
-            $h.d = (Get-Module WindowsShell).NewBoundScriptBlock({
+            $h.d = $h.m.NewBoundScriptBlock({
                 [ShellLibrary]::new()
             }).InvokeReturnAsIs()
             $h.d.Name = $libraryName

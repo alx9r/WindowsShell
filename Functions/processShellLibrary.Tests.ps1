@@ -56,12 +56,12 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
     Mock Set-ShellLibraryProperty -Verifiable
     Context 'absent, Set' {
         Mock Add-ShellLibrary {
-            New-Object ShellLibrary -Property @{
+            New-Object psobject -Property @{
                 Name = 'libary name'
             }
         } -Verifiable
         It 'returns nothing' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
@@ -93,7 +93,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             }
         } -Verifiable
         It 'returns nothing' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 IconFilePath = 'c:\folder\some.exe'
@@ -124,7 +124,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             }
         } -Verifiable
         It 'returns nothing' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
@@ -155,7 +155,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             }
         } -Verifiable
         It 'returns nothing' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
             }
             $r = $object | Invoke-ProcessShellLibrary Set
@@ -189,7 +189,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
     }
     Context 'absent, Test' {
         It 'returns false' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
@@ -216,7 +216,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             }
         } -Verifiable
         It 'returns nothing' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
@@ -242,7 +242,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             }
         } -Verifiable
         It 'returns true' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
@@ -269,7 +269,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             }
         } -Verifiable
         It 'returns false' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Music'
                 StockIconName = 'Application'
@@ -296,7 +296,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             }
         } -Verifiable
         It 'returns false' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
@@ -326,7 +326,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
     Mock Set-ShellLibraryProperty -Verifiable
     Context 'absent, Set' {
         It 'returns nothing' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
@@ -346,7 +346,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
     }
     Context 'absent, Test' {
         It 'returns true' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
@@ -374,7 +374,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
             }
         } -Verifiable
         It 'returns nothing' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
@@ -401,7 +401,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
             }
         } -Verifiable
         It 'returns false' {
-            $object = New-Object ShellLibrary -Property @{
+            $object = New-Object psobject -Property @{
                 Name = 'library name'
                 TypeName = 'Pictures'
                 StockIconName = 'Application'
