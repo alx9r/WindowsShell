@@ -1,6 +1,10 @@
-Import-Module ToolFoundations -WarningAction SilentlyContinue
-
 $moduleRoot = Split-Path -Path $MyInvocation.MyCommand.Path
+
+# dot source the external dependencies...
+"$moduleRoot\External\*.ps1" |
+    Get-Item |
+    ? { $_.Name -notmatch 'Tests\.ps1$' } |
+    % { . $_.FullName }
 
 # load the Windows API Code Pack Assembly
 Add-Type -Path "$moduleRoot\bin\winapicp\Microsoft.WindowsAPICodePack.Shell.dll"
