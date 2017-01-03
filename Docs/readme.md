@@ -53,7 +53,7 @@ if ( Invoke-ProcessShellLibrary Test Present 'PowerShell Modules' )
 
 The results can be observed using Windows Explorer:
 
-[image2]
+<img src="https://cloud.githubusercontent.com/assets/11237922/21626091/06f535d2-d1c4-11e6-9c14-293cd691996c.png" alt="windows explorer showing shell library" width="400">
 
 ### DSC Resources
 
@@ -86,7 +86,7 @@ $instructions | Invoke-ConfigStep
 
 The results can be observed using Windows Explorer:
 
-[image3]
+<img src="https://cloud.githubusercontent.com/assets/11237922/21626097/0ec40518-d1c4-11e6-81cc-3e7ed34e6bee.png" alt="windows explorer showing shell library" width="600">
 
 ## Feedback
 

@@ -8,7 +8,7 @@ WindowsShell is a PowerShell module for configuring the Window Shell Libraries.
 
 Configure Windows Shell Libraries like this
 
-[image]
+<img src="https://cloud.githubusercontent.com/assets/11237922/21626090/0069d2a4-d1c4-11e6-806c-47273fe07b92.png" alt="windows explorer showing shell library" width="400">
 
 using straightforward PowerShell commands like this
 
@@ -21,7 +21,7 @@ PS C:\> Invoke-ProcessShellLibrary Set Present 'PSModulePath' -IconFilePath $ico
 
 You can find the getting started documentation [here][].  
 
-[here]: Docs/getting-started
+[here]: Docs
 
 # Roadmap
 
