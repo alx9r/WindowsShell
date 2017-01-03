@@ -16,7 +16,7 @@ GUID = '31eacef0-4fab-41fd-ac9e-6c65b0098e1f'
 Author = 'alx9r'
 
 # Copyright statement for this module
-Copyright = '(c) 2016 Microsoft. All rights reserved.'
+Copyright = '(c) 2016-2017 Microsoft. All rights reserved.'
 
 # Description of the functionality provided by this module
 # Description = ''
