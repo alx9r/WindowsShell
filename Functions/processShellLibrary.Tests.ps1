@@ -6,6 +6,8 @@ Describe 'set up environment' {
     }
 }
 
+InModuleScope WindowsShell {
+
 Describe Test-ValidShellLibraryTypeName {
     It 'returns true for valid name' {
         $r = 'Pictures' | Test-ValidShellLibraryTypeName
@@ -45,381 +47,378 @@ Describe Test-ValidStockIconName {
 }
 
 Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
-    InModuleScope WindowsShell {
-        Mock Get-ShellLibrary -Verifiable
-        Mock Add-ShellLibrary -Verifiable
-        Mock Remove-ShellLibrary -Verifiable
-        Mock Get-StockIconReferencePath {
-            'C:\WINDOWS\system32\imageres.dll,-152'
+    Mock Get-ShellLibrary -Verifiable
+    Mock Add-ShellLibrary -Verifiable
+    Mock Remove-ShellLibrary -Verifiable
+    Mock Get-StockIconReferencePath {
+        'C:\WINDOWS\system32\imageres.dll,-152'
+    } -Verifiable
+    Mock Set-ShellLibraryProperty -Verifiable
+    Context 'absent, Set' {
+        Mock Add-ShellLibrary {
+            New-Object ShellLibrary -Property @{
+                Name = 'libary name'
+            }
         } -Verifiable
-        Mock Set-ShellLibraryProperty -Verifiable
-        Context 'absent, Set' {
-            Mock Add-ShellLibrary {
-                New-Object ShellLibrary -Property @{
-                    Name = 'libary name'
-                }
-            } -Verifiable
-            It 'returns nothing' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Set
-                $r | Should beNullOrEmpty
+        It 'returns nothing' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
             }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 1 { 
-                    $PropertyName -eq 'TypeName' -and
-                    $Value -eq 'Pictures'
-                }
-                Assert-MockCalled Get-StockIconReferencePath 1 {
-                    $StockIconName -eq 'Application'
-                }
-                Assert-MockCalled Set-ShellLibraryProperty 1 { 
-                    $PropertyName -eq 'IconReferencePath' -and
-                    $Value -eq 'C:\WINDOWS\system32\imageres.dll,-152'
-                }
+            $r = $object | Invoke-ProcessShellLibrary Set
+            $r | Should beNullOrEmpty
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                $PropertyName -eq 'TypeName' -and
+                $Value -eq 'Pictures'
+            }
+            Assert-MockCalled Get-StockIconReferencePath 1 {
+                $StockIconName -eq 'Application'
+            }
+            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                $PropertyName -eq 'IconReferencePath' -and
+                $Value -eq 'C:\WINDOWS\system32\imageres.dll,-152'
             }
         }
-        Context 'IconFilePath' {
-            Mock Add-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                }
-            } -Verifiable
-            It 'returns nothing' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    IconFilePath = 'c:\folder\some.exe'
-                    IconResourceId = 0
-                }
-                $r = $object | Invoke-ProcessShellLibrary Set
-                $r | Should beNullOrEmpty
+    }
+    Context 'IconFilePath' {
+        Mock Add-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
             }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 1 { 
-                    $PropertyName -eq 'TypeName' -and
-                    $Value -eq 'Pictures'
-                }
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 1 { 
-                    $PropertyName -eq 'IconReferencePath' -and
-                    $Value -eq 'C:\folder\some.exe,0'
-                }
-            }            
+        } -Verifiable
+        It 'returns nothing' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                IconFilePath = 'c:\folder\some.exe'
+                IconResourceId = 0
+            }
+            $r = $object | Invoke-ProcessShellLibrary Set
+            $r | Should beNullOrEmpty
         }
-        Context 'StockIcon and IconFilePath' {
-            Mock Add-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                }
-            } -Verifiable
-            It 'returns nothing' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                    IconFilePath = 'c:\folder\some.exe'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Set
-                $r | Should beNullOrEmpty
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                $PropertyName -eq 'TypeName' -and
+                $Value -eq 'Pictures'
             }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 1 { 
-                    $PropertyName -eq 'TypeName' -and
-                    $Value -eq 'Pictures'
-                }
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 1 { 
-                    $PropertyName -eq 'IconReferencePath' -and
-                    $Value -eq 'C:\folder\some.exe,0'
-                }
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                $PropertyName -eq 'IconReferencePath' -and
+                $Value -eq 'C:\folder\some.exe,0'
             }
+        }            
+    }
+    Context 'StockIcon and IconFilePath' {
+        Mock Add-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
+            }
+        } -Verifiable
+        It 'returns nothing' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
+                IconFilePath = 'c:\folder\some.exe'
+            }
+            $r = $object | Invoke-ProcessShellLibrary Set
+            $r | Should beNullOrEmpty
         }
-        Context 'null optional properties' {
-            Mock Add-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                }
-            } -Verifiable
-            It 'returns nothing' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Set
-                $r | Should beNullOrEmpty
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                $PropertyName -eq 'TypeName' -and
+                $Value -eq 'Pictures'
             }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 1 { 
+                $PropertyName -eq 'IconReferencePath' -and
+                $Value -eq 'C:\folder\some.exe,0'
             }
         }
-        Context 'omit optional properties' {
-            Mock Add-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                }
-            } -Verifiable
-            It 'returns nothing' {
-                $r = Invoke-ProcessShellLibrary Set Present 'library name'
-                $r | Should beNullOrEmpty
+    }
+    Context 'null optional properties' {
+        Mock Add-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
             }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+        } -Verifiable
+        It 'returns nothing' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
             }
+            $r = $object | Invoke-ProcessShellLibrary Set
+            $r | Should beNullOrEmpty
         }
-        Context 'absent, Test' {
-            It 'returns false' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Test
-                $r.Count | Should be 1
-                $r | Should be $false
-            }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 0 -Exactly
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
-            }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
         }
-        Context 'present, Set' {
-            Mock Get-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                    TypeName = 'Pictures'
-                    IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
-                }
-            } -Verifiable
-            It 'returns nothing' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Set
-                $r | Should beNullOrEmpty
+    }
+    Context 'omit optional properties' {
+        Mock Add-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
             }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 0 -Exactly
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
-                Assert-MockCalled Get-StockIconReferencePath 1
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
-            }
+        } -Verifiable
+        It 'returns nothing' {
+            $r = Invoke-ProcessShellLibrary Set Present 'library name'
+            $r | Should beNullOrEmpty
         }
-        Context 'present, Test' {
-            Mock Get-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                    TypeName = 'Pictures'
-                    IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
-                }
-            } -Verifiable
-            It 'returns true' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Test
-                $r.Count | Should be 1
-                $r | Should be $true
-            }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 0 -Exactly
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
-                Assert-MockCalled Get-StockIconReferencePath 1
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
-            }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
         }
-        Context 'present wrong type, Test' {
-            Mock Get-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                    TypeName = 'Pictures'
-                    IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
-                }
-            } -Verifiable
-            It 'returns false' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Music'
-                    StockIconName = 'Application'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Test
-                $r.Count | Should be 1
-                $r | Should be $false
+    }
+    Context 'absent, Test' {
+        It 'returns false' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
             }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 0 -Exactly
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
-            }
+            $r = $object | Invoke-ProcessShellLibrary Test
+            $r.Count | Should be 1
+            $r | Should be $false
         }
-        Context 'present wrong icon, Test' {
-            Mock Get-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                    TypeName = 'Pictures'
-                    IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-94'
-                }
-            } -Verifiable
-            It 'returns false' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Test
-                $r.Count | Should be 1
-                $r | Should be $false
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 0 -Exactly
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
+        }
+    }
+    Context 'present, Set' {
+        Mock Get-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
+                TypeName = 'Pictures'
+                IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
             }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 0 -Exactly
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
-                Assert-MockCalled Get-StockIconReferencePath 1
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
+        } -Verifiable
+        It 'returns nothing' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
             }
+            $r = $object | Invoke-ProcessShellLibrary Set
+            $r | Should beNullOrEmpty
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 0 -Exactly
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Get-StockIconReferencePath 1
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
+        }
+    }
+    Context 'present, Test' {
+        Mock Get-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
+                TypeName = 'Pictures'
+                IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
+            }
+        } -Verifiable
+        It 'returns true' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
+            }
+            $r = $object | Invoke-ProcessShellLibrary Test
+            $r.Count | Should be 1
+            $r | Should be $true
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 0 -Exactly
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Get-StockIconReferencePath 1
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
+        }
+    }
+    Context 'present wrong type, Test' {
+        Mock Get-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
+                TypeName = 'Pictures'
+                IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
+            }
+        } -Verifiable
+        It 'returns false' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Music'
+                StockIconName = 'Application'
+            }
+            $r = $object | Invoke-ProcessShellLibrary Test
+            $r.Count | Should be 1
+            $r | Should be $false
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 0 -Exactly
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
+        }
+    }
+    Context 'present wrong icon, Test' {
+        Mock Get-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
+                TypeName = 'Pictures'
+                IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-94'
+            }
+        } -Verifiable
+        It 'returns false' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
+            }
+            $r = $object | Invoke-ProcessShellLibrary Test
+            $r.Count | Should be 1
+            $r | Should be $false
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 0 -Exactly
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Get-StockIconReferencePath 1
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
         }
     }
 }
 
 Describe 'Invoke-ProcessShellLibrary -Ensure Absent' {
-    InModuleScope WindowsShell {
-        Mock Get-ShellLibrary -Verifiable
-        Mock Add-ShellLibrary -Verifiable
-        Mock Remove-ShellLibrary -Verifiable
-        Mock Get-StockIconReferencePath {
-            'C:\WINDOWS\system32\imageres.dll,-152'
-        } -Verifiable
-        Mock Set-ShellLibraryProperty -Verifiable
-        Context 'absent, Set' {
-            It 'returns nothing' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                    Ensure = 'Absent'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Set
-                $r | Should beNullOrEmpty
+    Mock Get-ShellLibrary -Verifiable
+    Mock Add-ShellLibrary -Verifiable
+    Mock Remove-ShellLibrary -Verifiable
+    Mock Get-StockIconReferencePath {
+        'C:\WINDOWS\system32\imageres.dll,-152'
+    } -Verifiable
+    Mock Set-ShellLibraryProperty -Verifiable
+    Context 'absent, Set' {
+        It 'returns nothing' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
+                Ensure = 'Absent'
             }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 0 -Exactly
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
-            }
+            $r = $object | Invoke-ProcessShellLibrary Set
+            $r | Should beNullOrEmpty
         }
-        Context 'absent, Test' {
-            It 'returns true' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                    Ensure = 'Absent'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Test
-                $r.Count | Should be 1
-                $r | Should be $true
-            }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 0 -Exactly
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
-            }
-        }
-        Context 'present, Set' {
-            Mock Get-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                    TypeName = 'Pictures'
-                    IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
-                }
-            } -Verifiable
-            It 'returns nothing' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                    Ensure = 'Absent'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Set
-                $r | Should beNullOrEmpty
-            }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 0 -Exactly
-                Assert-MockCalled Remove-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
-            }
-        }
-        Context 'present, Test' {
-            Mock Get-ShellLibrary {
-                New-Object ShellLibraryInfo -Property @{
-                    Name = 'libary name'
-                    TypeName = 'Pictures'
-                    IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
-                }
-            } -Verifiable
-            It 'returns false' {
-                $object = New-Object ShellLibrary -Property @{
-                    Name = 'library name'
-                    TypeName = 'Pictures'
-                    StockIconName = 'Application'
-                    Ensure = 'Absent'
-                }
-                $r = $object | Invoke-ProcessShellLibrary Test
-                $r.Count | Should be 1
-                $r | Should be $false
-            }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Add-ShellLibrary 0 -Exactly
-                Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
-                Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-                Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
-            }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 0 -Exactly
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
         }
     }
+    Context 'absent, Test' {
+        It 'returns true' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
+                Ensure = 'Absent'
+            }
+            $r = $object | Invoke-ProcessShellLibrary Test
+            $r.Count | Should be 1
+            $r | Should be $true
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 0 -Exactly
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
+        }
+    }
+    Context 'present, Set' {
+        Mock Get-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
+                TypeName = 'Pictures'
+                IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
+            }
+        } -Verifiable
+        It 'returns nothing' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
+                Ensure = 'Absent'
+            }
+            $r = $object | Invoke-ProcessShellLibrary Set
+            $r | Should beNullOrEmpty
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 0 -Exactly
+            Assert-MockCalled Remove-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
+        }
+    }
+    Context 'present, Test' {
+        Mock Get-ShellLibrary {
+            New-Object ShellLibraryInfo -Property @{
+                Name = 'libary name'
+                TypeName = 'Pictures'
+                IconReferencePath = 'C:\WINDOWS\system32\imageres.dll,-152'
+            }
+        } -Verifiable
+        It 'returns false' {
+            $object = New-Object ShellLibrary -Property @{
+                Name = 'library name'
+                TypeName = 'Pictures'
+                StockIconName = 'Application'
+                Ensure = 'Absent'
+            }
+            $r = $object | Invoke-ProcessShellLibrary Test
+            $r.Count | Should be 1
+            $r | Should be $false
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
+            Assert-MockCalled Add-ShellLibrary 0 -Exactly
+            Assert-MockCalled Remove-ShellLibrary 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
+        }
+    }
+}
 }

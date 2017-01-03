@@ -18,22 +18,6 @@ Add-Type -Path "$moduleRoot\bin\winapicp\Microsoft.WindowsAPICodePack.Shell.dll"
     % { . $_.FullName }
 
 Export-ModuleMember -Function @(
-    'Test-ValidShellLibraryName'
-    'Add-ShellLibrary'
-    'Add-ShellLibraryFolder'
-    'Convert-ShellLibraryObject'
-    'Get-ShellLibrary'
-    'Get-ShellLibraryPath'
-    'Get-StockIconReferencePath'
     'Invoke-ProcessShellLibrary'
     'Invoke-ProcessShellLibraryFolder'
-    'Remove-ShellLibrary'
-    'Remove-ShellLibraryFolder'
-    'Set-ShellLibraryProperty'
-    #'Sort-ShellLibraryFolders'
-    'Test-ShellLibrary'
-    'Test-ShellLibraryFolder'
-    'Test-ShellLibraryFoldersSortOrder'
-    'Test-ValidShellLibraryTypeName'
-    'Test-ValidStockIconName'
 )

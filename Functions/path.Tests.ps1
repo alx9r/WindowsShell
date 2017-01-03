@@ -1,6 +1,7 @@
 Import-Module WindowsShell -Force
 
 InModuleScope WindowsShell {
+
 Describe Test-FolderPathsAreEqual {
     $values = @(
         @('c:\folder\', 'c:\folder',  $true),
@@ -18,6 +19,7 @@ Describe Test-FolderPathsAreEqual {
         }
     }
 }
+
 Describe ConvertTo-WindowsShellFolderPathFormat {
     $values = @(
         @('c:\folder', 'c:\folder'),

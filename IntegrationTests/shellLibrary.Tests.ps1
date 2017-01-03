@@ -6,6 +6,8 @@ Describe 'set up environment' {
     }
 }
 
+InModuleScope WindowsShell {
+
 Describe Get-ShellLibrary {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
     $libraryName = "Get-ShellLibrary-$guidFrag"
@@ -173,4 +175,5 @@ Describe Get-StockIconReferencePath {
         $r = 'World' | Get-StockIconReferencePath
         $r | Should be 'C:\WINDOWS\system32\imageres.dll,-152'
     }
+}
 }

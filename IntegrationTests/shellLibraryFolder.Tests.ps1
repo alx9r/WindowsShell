@@ -6,6 +6,8 @@ Describe 'set up environment' {
     }
 }
 
+InModuleScope WindowsShell {
+
 Describe Test-ShellLibraryFolder {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
     $libraryName = "Test-ShellLibraryFolder-$guidFrag"
@@ -276,4 +278,5 @@ Describe Remove-ShellLibraryFolder {
             $r | Should be $true
         }
     }
+}
 }
