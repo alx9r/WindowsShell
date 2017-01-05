@@ -2,7 +2,7 @@
 
 # WindowsShell
 
-WindowsShell is a PowerShell module for configuring the Window Shell Libraries.
+WindowsShell is a PowerShell module for configuring Windows Shell Libraries.
 
 # Use
 
