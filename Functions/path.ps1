@@ -34,7 +34,7 @@ function ConvertTo-WindowsShellFolderPathFormat
     process
     {
         $splat = @{
-            FilePathType = 'Windows'
+            Scheme = 'plain'
             TrailingSlash = $false
         }
         return $InputPath |
