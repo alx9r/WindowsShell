@@ -26,7 +26,15 @@ function Test-ShellLibraryFolder
             # load the library
             $l = [Microsoft.WindowsAPICodePack.Shell.ShellLibrary]::Load($LibraryName,$true)
 
-            if ( -not ($FolderPath | Test-Path -PathType Container -ea Stop ) )
+            # safely test if the path exists
+            try
+            {
+                # Test-Path can throw an exception for UNC paths
+                $folderPathExists = $FolderPath | Test-Path -PathType Container
+            }
+            catch {}
+
+            if ( -not ( $folderPathExists ) )
             {
                 # the file system folder does not exist
                 # search through the list of folders

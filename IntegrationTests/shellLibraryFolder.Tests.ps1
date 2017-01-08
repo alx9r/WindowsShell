@@ -78,6 +78,12 @@ Describe Test-ShellLibraryFolder {
             $r | Should be $false
         }
     }
+    Context 'the folder does not exist and neither does the file system folder (UNC)' {
+        It 'returns false' {
+            $r = '\\serverc41f5bdb.net\path' | Test-ShellLibraryFolder $libraryName
+            $r | Should be $false
+        }
+    }
     Context 'library doesn''t exist' {
         It 'remove the library' {
             Invoke-ProcessShellLibrary Set Absent $libraryName
