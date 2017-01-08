@@ -1,3 +1,7 @@
+## 0.1.1
+ - fix problems handling UNC paths
+ - improve documentation
+
 ## 0.1.0 (2017-01-03)
  - write various riders to characterize expected behavior of the winapicp library and some lower-level Windows API
  - implement two interfaces to manipulate Shell Libraries, Shell Library Folders, and their attributes:
