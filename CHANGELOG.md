@@ -1,4 +1,6 @@
-## 0.1.1
+## 0.1.2
+
+## 0.1.1 (2017-01-18)
  - fix problems handling UNC paths
  - improve documentation
 
