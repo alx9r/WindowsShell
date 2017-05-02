@@ -207,8 +207,16 @@ Describe 'Shortcut Hotkey String' {
     }
     Context 'use Shell.Shortcut method to normalize' {
         $h = @{}
-        It 'create shortcut without target path' {
-            $wshShell
+        It 'create shortcut object' {
+            $wshShell = New-Object -ComObject WScript.Shell
+            $h.shortcut = $wshShell.CreateShortcut("$([guid]::NewGuid().Guid).lnk")
+        }
+        It 'set Hotkey property' {
+            $h.shortcut.Hotkey = 'Ctrl+Alt+f'
+        }
+        It 'the string in the property is normalized' {
+            $h.shortcut.Hotkey |
+                Should be 'Alt+Ctrl+f'
         }
     }
     It 'cleanup' {
