@@ -1,7 +1,7 @@
 <#
 Keeping any reference to an object returned by a call to WindowsAPICodePack.Shell.ShellLibrary
-can cause errors on subsequent calls.  The solution to this seems to be to relinquish all
-references to WindowsAPICodePack.Shell.ShellLibrary then collect garbage between calls.
+can cause errors on subsequent calls.  The solution to this seems to be to call .Dispose() on
+all objects from WindowsAPICodePack.Shell.ShellLibrary between calls.
 #>
 
 Describe 'set up environment' {
