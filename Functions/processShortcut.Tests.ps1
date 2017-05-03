@@ -2,70 +2,61 @@ Import-Module WindowsShell -Force
 
 InModuleScope WindowsShell {
 
-Describe Test-ValidShellLibraryTypeName {
-    It 'returns true for valid name' {
-        $r = 'Pictures' | Test-ValidShellLibraryTypeName
-        $r | Should be $true
-    }
-    It 'returns true for DoNotSet' {
-        $r = 'DoNotSet' | Test-ValidShellLibraryTypeName
-        $r | Should be $true
-    }
-    It 'returns false for invalid name' {
-        $r = 'Invalid Type Name' | Test-ValidShellLibraryTypeName
-        $r | Should be $false
-    }
-    It 'throws for invalid name' {
-        { 'Invalid Type Name' | Test-ValidShellLibraryTypeName -ea Stop } |
-            Should throw 'not a valid'
-    }
-}
-
-Describe 'Invoke-ProcessShellLibrary' {
+Describe 'Invoke-ProcessShortcut' {
     Mock Get-IconReferencePath -Verifiable
-    Mock Invoke-ProcessPersistentItem { 'return value' } -Verifiable
+    Mock Invoke-ProcessPersistentItem -Verifiable
     Context 'plumbing' {
         Mock Get-IconReferencePath { 'icon reference path' } -Verifiable
+        Mock Invoke-ProcessPersistentItem { 'return value' } -Verifiable
         It 'returns exactly one item' {
             $params = New-Object psobject -Property @{
                 Mode = 'Set'
                 Ensure = 'Present'
-                Name = 'name'
-                TypeName = 'Pictures'
-                StockIconName = 'AudioFiles'
-                IconFilePath = 'c:/filepath'
+                Path = 'path'
+                TargetPath = 'target path'
+                Arguments = 'arguments'
+                WorkingDirectory = 'working directory'
+                WindowStyle = 'Normal'
+                Hotkey = 'hotkey'
+                StockIconName = 'stock icon name'
+                IconFilePath = 'icon file path'
                 IconResourceId = 1
+                Description = 'description'
             }
-            $r = $params | Invoke-ProcessShellLibrary
+            $r = $params | Invoke-ProcessShortcut
             $r.Count | Should be 1
             $r | Should be 'return value'
         }
         It 'correctly invokes functions' {
             Assert-MockCalled Get-IconReferencePath 1 {
-                $StockIconName -eq 'AudioFiles' -and
-                $IconFilePath -eq 'c:/filepath' -and
+                $StockIconName -eq 'stock icon name' -and
+                $IconFilePath -eq 'icon file path' -and
                 $IconResourceId -eq 1
             }
             Assert-MockCalled Invoke-ProcessPersistentItem 1 {
                 $Mode -eq 'Set' -and
                 $Ensure -eq 'Present' -and
-                $_Keys.Name -eq 'name' -and
+                $_Keys.Path -eq 'path' -and
 
                 #Properties
-                $Properties.TypeName -eq 'Pictures' -and
-                $Properties.IconReferencePath -eq 'icon reference path' # <- icon
+                $Properties.TargetPath -eq 'target path' -and
+                $Properties.Arguments -eq 'arguments' -and
+                $Properties.WorkingDirectory -eq 'working directory' -and
+                $Properties.WindowStyle -eq 'Normal' -and
+                $Properties.IconLocation -eq 'icon reference path' -and # <- icon
+                $Properties.Description -eq 'description'
             }
         }
     }
     Context 'omit optional' {
+        Mock Invoke-ProcessPersistentItem { 'return value' } -Verifiable
         It 'returns exactly one item' {
             $params = New-Object psobject -Property @{
                 Mode = 'Set'
                 Ensure = 'Present'
-                Name = 'name'
-                TypeName = 'DoNotSet'
+                Path = 'path'
             }
-            $r = $params | Invoke-ProcessShellLibrary
+            $r = $params | Invoke-ProcessShortcut
             $r.Count | Should be 1
             $r | Should be 'return value'
         }
@@ -73,7 +64,7 @@ Describe 'Invoke-ProcessShellLibrary' {
             Assert-MockCalled Invoke-ProcessPersistentItem 1 {
                 $Mode -eq 'Set' -and
                 $Ensure -eq 'Present' -and
-                $_Keys.Name -eq 'name' -and
+                $_Keys.Path -eq 'path' -and
 
                 #Properties
                 $Properties.Count -eq 0

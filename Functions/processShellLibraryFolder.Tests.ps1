@@ -1,167 +1,33 @@
 Import-Module WindowsShell -Force
 
-Describe 'set up environment' {
-    It 'add the Windows API Code Pack assembly' {
-        Add-Type -Path "$PSScriptRoot\..\bin\winapicp\Microsoft.WindowsAPICodePack.Shell.dll"
+InModuleScope WindowsShell {
+
+Describe 'Invoke-ProcessShellLibraryFolder' {
+    Mock Invoke-ProcessPersistentItem { 'return value' } -Verifiable
+    Context 'plumbing'{
+        It 'returns exactly one item' {
+            $params = New-Object psobject -Property @{
+                Mode = 'Set'
+                Ensure = 'Present'
+                FolderPath = 'c:\folder\path'
+                LibraryName = 'LibraryName'
+            }
+            $r = $params | Invoke-ProcessShellLibraryFolder
+            $r.Count | Should be 1
+            $r | Should be 'return value'
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Invoke-ProcessPersistentItem 1 {
+                $Mode -eq 'Set' -and
+                $Ensure -eq 'Present' -and
+                $_Keys.FolderPath -eq 'c:\folder\path' -and
+                $_Keys.LibraryName -eq 'LibraryName' -and
+
+                #Properties
+                $Properties.Count -eq 0
+            }
+        }
     }
+}
 }
 
-Describe 'Invoke-ProcessShellLibraryFolder -Ensure Present' {
-    InModuleScope WindowsShell {
-        Mock Test-ShellLibrary { $true } -Verifiable
-        Mock Test-ShellLibraryFolder -Verifiable
-        Mock Add-ShellLibraryFolder -Verifiable
-        Mock Remove-ShellLibraryFolder -Verifiable
-        Context 'absent, Set'{
-            It 'returns nothing' {
-                $r = 'c:\folder' | Invoke-ProcessShellLibraryFolder Set Present 'library name'
-                $r | Should beNullOrEmpty
-            }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Test-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Test-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-                Assert-MockCalled Add-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-                Assert-MockCalled Remove-ShellLibraryFolder 0 -Exactly
-            }
-        }
-        Context 'library missing, Set' {
-            Mock Test-ShellLibrary { $false } -Verifiable
-            It 'returns nothing' {
-                $r = 'c:\folder' | Invoke-ProcessShellLibraryFolder Set Present 'library name'
-                $r | Should beNullOrEmpty
-            }
-            It 'correctly invokes functions' {
-                Assert-MockCalled Test-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Test-ShellLibraryFolder 0 -Exactly
-                Assert-MockCalled Add-ShellLibraryFolder 0 -Exactly
-                Assert-MockCalled Remove-ShellLibraryFolder 0 -Exactly
-            }
-        }
-        Context 'absent, Test' {
-            It 'returns false' {
-                $r = 'c:\folder' | Invoke-ProcessShellLibraryFolder Test Present 'library name'
-                $r | Should be $false
-            }
-            It 'correctly invokes functions ' {
-                Assert-MockCalled Test-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Test-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-                Assert-MockCalled Add-ShellLibraryFolder 0 -Exactly
-                Assert-MockCalled Remove-ShellLibraryFolder 0 -Exactly
-            }
-        }
-        Context 'present, Set' {
-            Mock Test-ShellLibraryFolder { $true } -Verifiable
-            It 'returns nothing' {
-                $r = 'c:\folder' | Invoke-ProcessShellLibraryFolder Set Present 'library name'
-                $r | Should beNullOrEmpty
-            }
-            It 'correctly invokes functions ' {
-                Assert-MockCalled Test-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Test-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-                Assert-MockCalled Add-ShellLibraryFolder 0 -Exactly
-                Assert-MockCalled Remove-ShellLibraryFolder 0 -Exactly
-            }
-        }
-        Context 'present, Test' {
-            Mock Test-ShellLibraryFolder { $true } -Verifiable
-            It 'returns true' {
-                $r = 'c:\folder' | Invoke-ProcessShellLibraryFolder Test Present 'library name'
-                $r | Should be $true
-            }
-            It 'correctly invokes functions ' {
-                Assert-MockCalled Test-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Test-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-                Assert-MockCalled Add-ShellLibraryFolder 0 -Exactly
-                Assert-MockCalled Remove-ShellLibraryFolder 0 -Exactly
-            }
-        }
-    }
-}
-Describe 'Invoke-ProcessShellLibraryFolder -Ensure Absent' {
-    InModuleScope WindowsShell {
-        Mock Test-ShellLibrary { $true } -Verifiable
-        Mock Test-ShellLibraryFolder -Verifiable
-        Mock Add-ShellLibraryFolder -Verifiable
-        Mock Remove-ShellLibraryFolder -Verifiable
-        Context 'absent, Set'{
-            It 'returns nothing' {
-                $r = 'c:\folder' | Invoke-ProcessShellLibraryFolder Set Absent 'library name'
-                $r | Should beNullOrEmpty
-            }
-            It 'correctly invokes functions ' {
-                Assert-MockCalled Test-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Test-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-                Assert-MockCalled Add-ShellLibraryFolder 0 -Exactly
-                Assert-MockCalled Remove-ShellLibraryFolder 0 -Exactly
-            }
-        }
-        Context 'absent, Test' {
-            It 'returns true' {
-                $r = 'c:\folder' | Invoke-ProcessShellLibraryFolder Test Absent 'library name'
-                $r | Should be $true
-            }
-            It 'correctly invokes functions ' {
-                Assert-MockCalled Test-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Test-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-                Assert-MockCalled Add-ShellLibraryFolder 0 -Exactly
-                Assert-MockCalled Remove-ShellLibraryFolder 0 -Exactly
-            }
-        }
-        Context 'present, Set' {
-            Mock Test-ShellLibraryFolder { $true } -Verifiable
-            It 'returns nothing' {
-                $r = 'c:\folder' | Invoke-ProcessShellLibraryFolder Set Absent 'library name'
-                $r | Should beNullOrEmpty
-            }
-            It 'correctly invokes functions ' {
-                Assert-MockCalled Test-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Test-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-                Assert-MockCalled Add-ShellLibraryFolder 0 -Exactly
-                Assert-MockCalled Remove-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-            }
-        }
-        Context 'present, Test' {
-            Mock Test-ShellLibraryFolder { $true } -Verifiable
-            It 'returns false' {
-                $r = 'c:\folder' | Invoke-ProcessShellLibraryFolder Test Absent 'library name'
-                $r | Should be $false
-            }
-            It 'correctly invokes functions ' {
-                Assert-MockCalled Test-ShellLibrary 1 { $Name -eq 'library name' }
-                Assert-MockCalled Test-ShellLibraryFolder 1 {
-                    $LibraryName -eq 'library name' -and
-                    $FolderPath -eq 'c:\folder'
-                }
-                Assert-MockCalled Add-ShellLibraryFolder 0 -Exactly
-                Assert-MockCalled Remove-ShellLibraryFolder 0 -Exactly
-            }
-        }
-    }
-}

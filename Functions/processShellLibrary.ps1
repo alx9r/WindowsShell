@@ -25,31 +25,6 @@ function Test-ValidShellLibraryTypeName
         return $true
     }
 }
-function Test-ValidStockIconName
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(ValueFromPipeline = $true,
-                   Mandatory = $true)]
-        [string]
-        $StockIconName
-    )
-    process
-    {
-        $out = New-Object Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier
-        if
-        (
-            $StockIconName -ne 'DoNotSet' -and
-            -not [Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier]::TryParse($StockIconName,[ref]$out)
-        )
-        {
-            &(Publish-Failure "$StockIconName is not a valid stock icon name",'IconName' ([System.ArgumentException]))
-            return $false
-        }
-        return $true
-    }
-}
 
 function Invoke-ProcessShellLibrary
 {
@@ -90,11 +65,7 @@ function Invoke-ProcessShellLibrary
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [int]
-        $IconResourceId=0,
-
-        [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string[]]
-        $FolderOrder
+        $IconResourceId=0
     )
     process
     {
@@ -103,94 +74,39 @@ function Invoke-ProcessShellLibrary
         $TypeName | ? {$_} | Test-ValidShellLibraryTypeName -ea Stop | Out-Null
         $StockIconName | ? {$_} | Test-ValidStockIconName -ea Stop | Out-Null
 
-        # retrieve the library
-        $library = $Name | Get-ShellLibrary
+        # pass through properties
+        $properties = @{}
+        'TypeName' |
+            ? { $_ -in $PSCmdlet.MyInvocation.BoundParameters.Keys } |
+            ? { (Get-Variable $_ -ValueOnly) -ne 'DoNotSet' } |
+            % { $properties.$_ = Get-Variable $_ -ValueOnly }
 
-        # process library existence
-        switch ( $Ensure )
+
+        # work out the icon
+        $splat = @{
+            StockIconName = $StockIconName
+            IconFilePath = $IconFilePath
+            IconResourceId = $IconResourceId
+        }
+        if ( $iconReferencePath = Get-IconReferencePath @splat )
         {
-            'Present' {
-                if ( -not $library )
-                {
-                    switch( $Mode )
-                    {
-                        'Set'  { $library = $Name | Add-ShellLibrary } # create the library
-                        'Test' { return $false }                       # the library doesn't exist
-                    }
-                }
-            }
-            'Absent' {
-                switch ( $Mode )
-                {
-                    'Set'  {
-                        if ( $library )
-                        {
-                            # the library exists, remove it
-                            $Name | Remove-ShellLibrary
-                        }
-                        return
-                    }
-                    'Test'
-                    {
-                        return -not $library
-                    }
-                }
-            }
+            $properties.IconReferencePath = $iconReferencePath
         }
 
-        # process library type
-        if
-        (
-            ( $TypeName -ne [string]::Empty -and $TypeName -ne 'DoNotSet' ) -and
-            $library.TypeName -ne $TypeName
-        )
-        {
-            switch ( $Mode )
-            {
-                'Set' {
-                    # correct the property
-                    $library | Set-ShellLibraryProperty TypeName $TypeName
-                }
-                'Test' { return $false } # the property is incorrect
-            }
+        # process
+        $splat = @{
+            Mode = $Mode
+            Ensure = $Ensure
+            Keys = @{ Name = $Name }
+            Properties = $properties
+            Getter  = 'Get-ShellLibrary'
+            Adder   = 'Add-ShellLibrary'
+            Remover = 'Remove-ShellLibrary'
+            PropertyGetter = 'Get-ShellLibraryProperty'
+            PropertySetter = 'Set-ShellLibraryProperty'
+            PropertyNormalizer = 'Get-NormalizedShellLibraryProperty'
         }
-
-        # process the icon name
-        if
-        (
-            ( $StockIconName -ne [string]::Empty -and $StockIconName -ne 'DoNotSet' ) -or
-            $IconFilePath
-        )
-        {
-            # compose the icon reference path
-            if ( $IconFilePath )
-            {
-                $iconReferencePath = "$IconFilePath,$IconResourceId"
-            }
-            else
-            {
-                $iconReferencePath = $StockIconName | Get-StockIconReferencePath
-            }
-
-            if ( $library.IconReferencePath -ne $iconReferencePath )
-            {
-                switch ( $Mode )
-                {
-                    'Set' {
-                        # correct the property
-                        $library | Set-ShellLibraryProperty IconReferencePath $iconReferencePath
-                    }
-                    'Test' { return $false } # the property is incorrect
-                }
-            }
-        }
-
-        # if a folder order is provided invoke Test-ShellLibraryFoldersSortOrder, Sort-ShellLibraryFolders
-
-        if ( $Mode -eq 'Test' )
-        {
-            return $true
-        }
+        Invoke-ProcessPersistentItem @splat
     }
 }
 

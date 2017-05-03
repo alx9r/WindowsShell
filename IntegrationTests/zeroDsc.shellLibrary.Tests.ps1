@@ -6,7 +6,7 @@ if ( -not (Get-Module ZeroDsc -ListAvailable) )
 Remove-Module WindowsShell -fo -ea si; Import-Module WindowsShell
 Import-Module PSDesiredStateConfiguration, ZeroDsc
 
-Describe 'Invoke with ZeroDsc' {
+Describe 'Invoke with ZeroDsc (ShellLibrary)' {
     $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
     $libraryName1 = "ZeroDsc1-$guidFrag"
     $libraryName2 = "ZeroDsc2-$guidFrag"
@@ -92,3 +92,4 @@ Describe 'Invoke with ZeroDsc' {
         }
     }
 }
+

@@ -66,10 +66,35 @@ function Test-ShellLibraryFolder
         {
             if ( $null -ne $l ) { $l.Dispose() }
         }
-        # new up a [ShellFileSystemFolder] from $FolderPath
-        # test if the library .Contains() the folder
 
         return $true
+    }
+}
+
+function Get-ShellLibraryFolder
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true)]
+        [ValidateScript({ $_ | Test-ValidFilePath })]
+        $FolderPath,
+
+        [Parameter(Mandatory = $true,
+                   Position = 1)]
+        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
+        $LibraryName
+    )
+    process
+    {
+        if ( $FolderPath | Test-ShellLibraryFolder $LibraryName )
+        {
+            return New-Object ShellLibraryFolderInfo -Property @{
+                LibraryName = $LibraryName
+                FolderPath = $FolderPath
+            }
+        }
     }
 }
 
