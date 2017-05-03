@@ -2,20 +2,19 @@
 
 # WindowsShell
 
-WindowsShell is a PowerShell module for configuring Windows Shell Libraries.
+WindowsShell is a PowerShell module for configuring Windows Shell Libraries and Shortcuts.
 
 # Use
 
-Configure Windows Shell Libraries like this
+ * Configure Windows Shortcuts
+ * Configure Windows Shell Libraries
+ * Perform the configuration using straightforward PowerShell commands
+ * Perform the configuration using PowerShell DSC
+
+### What's a Windows Shell Library? 
+Windows Shell Libraries are built-in to all versions of Windows beginning with Windows Vista.  They provide a standardized way of surfacing folders in the file system in Windows Explorer and most application's file dialog boxes. 
 
 <img src="https://cloud.githubusercontent.com/assets/11237922/21626090/0069d2a4-d1c4-11e6-806c-47273fe07b92.png" alt="windows explorer showing shell library" width="400">
-
-using straightforward PowerShell commands like this
-
-```PowerShell
-PS C:\> $iconPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
-PS C:\> Invoke-ProcessShellLibrary Set Present 'PSModulePath' -IconFilePath $iconPath
-```
 
 # Getting Started
 
