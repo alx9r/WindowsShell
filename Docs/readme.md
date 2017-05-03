@@ -34,6 +34,48 @@ Script     0.1.0      WindowsShell                        {Add-ShellLibrary, ...
 
 You should see some details about the WindowsShell module output by the `Get-Module` command as shown above.
 
+## Configuring Windows Shortcuts
+The WindowsShell module implements two interfaces for configuring shell libraries:
+
+* the PowerShell command `Invoke-ProcessShortcut`
+* the DSC Resource `Shortcut`
+
+## Commands
+
+The following command creates a Windows shortcut to `powershell.exe` on the desktop and assigns hotkeys to it.
+
+```PowerShell
+$splat = @{
+    Path = "$env:USERPROFILE\Desktop\powershell.lnk"
+    TargetPath = (Get-Command powershell.exe).Path 
+    Hotkey = 'Ctrl+Alt+Shift+P'
+}
+Invoke-ProcessShortcut Set Present @splat
+
+```
+
+The results can be observed using Windows Explorer.
+
+<img src="https://cloud.githubusercontent.com/assets/11237922/25685638/cb643b9a-301d-11e7-8dfb-374d6060c17e.png" alt="windows explorer and properties dialog box showing desktop shortcut" width="600">
+
+### DSC Resource
+
+Invoking the following ZeroDSC commands creates the same desktop shortcut as shown in the "Command" section above, except using the `Shortcut` DSC resource:
+
+```PowerShell
+$instructions = ConfigInstructions PSHotkey {
+    Get-DscResource Shortcut WindowsShell | Import-DscResource
+    
+    Shortcut PSHotkey @{
+        Path = "$env:USERPROFILE\Desktop\powershell.lnk"
+        TargetPath = (Get-Command powershell.exe).Path 
+        Hotkey = 'Ctrl+Alt+Shift+P'
+    }
+}
+
+$instructions | Invoke-ConfigStep
+```
+
 ## Configuring Windows Shell Libraries
 
 The WindowsShell modules implements two interfaces for configuring shell libraries:
