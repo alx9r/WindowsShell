@@ -66,8 +66,6 @@ function Test-ShellLibraryFolder
         {
             if ( $null -ne $l ) { $l.Dispose() }
         }
-        # new up a [ShellFileSystemFolder] from $FolderPath
-        # test if the library .Contains() the folder
 
         return $true
     }

@@ -1,11 +1,5 @@
 Import-Module WindowsShell -Force
 
-Describe 'set up environment' {
-    It 'add the Windows API Code Pack assembly' {
-        Add-Type -Path "$PSScriptRoot\..\bin\winapicp\Microsoft.WindowsAPICodePack.Shell.dll"
-    }
-}
-
 InModuleScope WindowsShell {
 
 Describe Get-ShellLibrary {
@@ -147,9 +141,13 @@ foreach ( $values in @(
                 $r = $libraryName | Set-ShellLibraryProperty $propertyName $propertyValue
                 $r | Should beNullOrEmpty
             }
-            It 'the property value is correct' {
+            It 'the property value is correct (Get-ShellLibrary)' {
                 $r = $libraryName | Get-ShellLibrary
                 $r.$propertyName | Should be $propertyValue
+            }
+            It 'the property value is correct (Get-ShellLibraryProperty)' {
+                $r = $libraryName | Get-ShellLibraryProperty $propertyName
+                $r | Should be $propertyValue
             }
         }
         Context 'cleanup' {

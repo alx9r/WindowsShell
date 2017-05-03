@@ -61,6 +61,7 @@ function Get-ShellLibrary
     (
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
+        [Alias('Key')]
         [string]
         $Name
     )
@@ -96,6 +97,7 @@ function Add-ShellLibrary
     (
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
+        [Alias('Key')]
         $Name
     )
     process
@@ -134,6 +136,7 @@ function Remove-ShellLibrary
     (
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
+        [Alias('Key')]
         [string]
         $Name
     )
@@ -154,6 +157,30 @@ function Remove-ShellLibrary
     }
 }
 
+function Get-ShellLibraryProperty
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string]
+        [Alias('Key','Name')]
+        $LibraryName,
+
+        [Parameter(Mandatory = $true,
+                   position = 1)]
+        [ValidateSet('TypeName','IconReferencePath')]
+        [string]
+        $PropertyName
+    )
+    process
+    {
+        ( $LibraryName | Get-ShellLibrary ).$PropertyName
+    }
+}
+
 function Set-ShellLibraryProperty
 {
     [CmdletBinding()]
@@ -163,7 +190,7 @@ function Set-ShellLibraryProperty
                    ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
         [string]
-        [Alias('Name')]
+        [Alias('Key','Name')]
         $LibraryName,
 
         [Parameter(Mandatory = $true,
@@ -205,5 +232,28 @@ function Set-ShellLibraryProperty
                 $l.Dispose()
             }
         }
+    }
+}
+
+function Get-NormalizedShellLibraryProperty
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   Position = 1)]
+        [string]
+        $PropertyName,
+
+        [Parameter(Mandatory = $true,
+                   Position = 2,
+                   ValueFromPipeline = $true)]
+        [AllowNull()]
+        [AllowEmptyString()]
+        $Value
+    )
+    process
+    {
+        $Value
     }
 }

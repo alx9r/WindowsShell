@@ -37,7 +37,6 @@ function Get-Shortcut
     (
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
-        [Alias('Key')]
         $Path
     )
     process
@@ -59,7 +58,6 @@ function Test-Shortcut
     (
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
-        [Alias('Key')]
         $Path
     )
     process
@@ -75,7 +73,6 @@ function Add-Shortcut
     (
         [Parameter(Mandatory = $true,
                    ValueFromPipeline = $true)]
-        [Alias('Key')]
         $Path
     )
     process
@@ -128,7 +125,6 @@ function Get-ShortcutProperty
                    ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
         [string]
-        [Alias('Key')]
         $Path,
 
         [Parameter(Mandatory = $true,
@@ -163,7 +159,6 @@ function Set-ShortcutProperty
                    ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
         [string]
-        [Alias('Key')]
         $Path,
 
         [Parameter(Mandatory = $true,

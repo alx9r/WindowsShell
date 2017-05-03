@@ -87,7 +87,7 @@ function Invoke-ProcessShortcut
         $splat = @{
             Mode = $Mode
             Ensure = $Ensure
-            Key = $Path
+            Keys = @{ Path = $Path }
             Properties = $properties
             Getter  = 'Get-ShortCut'
             Adder   = 'Add-ShortCut'
