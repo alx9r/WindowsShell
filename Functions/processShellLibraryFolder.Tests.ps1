@@ -20,8 +20,8 @@ Describe 'Invoke-ProcessShellLibraryFolder' {
             Assert-MockCalled Invoke-ProcessPersistentItem 1 {
                 $Mode -eq 'Set' -and
                 $Ensure -eq 'Present' -and
-                $Keys.FolderPath -eq 'c:\folder\path' -and
-                $Keys.LibraryName -eq 'LibraryName' -and
+                $_Keys.FolderPath -eq 'c:\folder\path' -and
+                $_Keys.LibraryName -eq 'LibraryName' -and
 
                 #Properties
                 $Properties.Count -eq 0

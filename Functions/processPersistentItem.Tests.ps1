@@ -42,7 +42,7 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             Assert-MockCalled Remove-PersistentItem 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 1 {
                 $Mode -eq 'Set' -and
-                $Keys.Key -eq 'key value' -and
+                $_Keys.Key -eq 'key value' -and
                 $Properties.P -eq 'P desired' -and
                 $PropertyGetter -eq 'Get-PersistentItemProperty' -and
                 $PropertySetter -eq 'Set-PersistentItemProperty' -and
