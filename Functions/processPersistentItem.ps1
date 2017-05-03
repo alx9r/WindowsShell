@@ -63,18 +63,18 @@ function Invoke-ProcessPersistentItem
             'Absent' {
                 switch ( $Mode )
                 {
-                    'Set'  { 
+                    'Set'  {
                         if ( $item )
                         {
                             & $Remover -Key $Key | Out-Null
                         }
-                        return 
+                        return
                     }
                     'Test' { return -not $item }
                 }
             }
         }
-        
+
         # process the item's properties
         $splat = @{
             Mode = $Mode

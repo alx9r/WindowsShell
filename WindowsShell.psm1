@@ -24,4 +24,5 @@ Add-Type -Path "$moduleRoot\bin\winapicp\Microsoft.WindowsAPICodePack.Shell.dll"
 Export-ModuleMember -Function @(
     'Invoke-ProcessShellLibrary'
     'Invoke-ProcessShellLibraryFolder'
+    'Invoke-ProcessShortcut'
 )

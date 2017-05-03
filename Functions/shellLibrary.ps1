@@ -207,19 +207,3 @@ function Set-ShellLibraryProperty
         }
     }
 }
-
-function Get-StockIconReferencePath
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true,
-                   ValueFromPipeline = $true)]
-        [Microsoft.WindowsAPICodePack.Shell.StockIconIdentifier]
-        $StockIconName
-    )
-    process
-    {
-        return [StockIconInfo.StockIconInfo]::GetIconRefPath([int]$StockIconName)
-    }
-}

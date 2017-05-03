@@ -147,7 +147,7 @@ foreach ( $values in @(
                 $r = $libraryName | Set-ShellLibraryProperty $propertyName $propertyValue
                 $r | Should beNullOrEmpty
             }
-            It 'the type name is correct' {
+            It 'the property value is correct' {
                 $r = $libraryName | Get-ShellLibrary
                 $r.$propertyName | Should be $propertyValue
             }

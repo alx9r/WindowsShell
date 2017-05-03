@@ -118,6 +118,7 @@ Describe 'Shortcut properties' {
     $shortcutPath = Join-Path $tempPath $shortcutFilename
 
     foreach ( $values in @(
+            @('TargetPath','c:\bogus\path.exe'),
             @('WindowStyle',1),
             @('Hotkey', 'Alt+Ctrl+f'),
             @('IconLocation','notepad.exe,0'),
@@ -224,4 +225,40 @@ Describe 'Shortcut Hotkey String' {
     }
 }
 
+Describe 'Shortcut existence' {
+    $guidFrag = [guid]::NewGuid().Guid.Split('-')[0]
+    $shortcutFilename = "Shortcut-$guidFrag.lnk"
+    $tempPath = [System.IO.Path]::GetTempPath()
+    $shortcutPath = Join-Path $tempPath $shortcutFilename
+
+    Context 'bogus shortcut file' {
+        It 'create bogus file' {
+            'bogus' | Set-Content $shortcutPath
+            Test-Path $shortcutPath | Should be $true
+        }
+        It 'read file as shortcut produces reasonable object' {
+            $wshShell = New-Object -comObject WScript.Shell
+            $shortcut = $wshShell.CreateShortcut($shortcutPath)
+            'Arguments','Description','Hotkey','RelativePath',
+            'TargetPath','WorkingDirectory' |
+                % { $shortcut.$_ | Should beNullOrEmpty }
+
+        }
+        It 'overwrite file' {
+            $wshShell = New-Object -comObject WScript.Shell
+            $shortcut = $wshShell.CreateShortcut($shortcutPath)
+            $shortcut.Description = 'some description'
+            $shortcut.Save()
+        }
+        It 'overwritten file reads back correctly' {
+            $wshShell = New-Object -comObject WScript.Shell
+            $shortcut = $wshShell.CreateShortcut($shortcutPath)
+            $shortcut.Description |
+                Should be 'some description'
+        }
+    }
+    It 'cleanup' {
+        Remove-Item $shortcutPath
+    }
+}
 }

@@ -27,25 +27,6 @@ Describe Test-ValidShellLibraryTypeName {
     }
 }
 
-Describe Test-ValidStockIconName {
-    It 'returns true for valid name' {
-        $r = 'Application' | Test-ValidStockIconName
-        $r | Should be $true
-    }
-    It 'returns true for DoNotSet' {
-        $r = 'DoNotSet' | Test-ValidStockIconName
-        $r | Should be $true
-    }
-    It 'returns false for invalid name' {
-        $r = 'Invalid Icon Name' | Test-ValidStockIconName
-        $r | Should be $false
-    }
-    It 'throws for invalid name' {
-        { 'Invalid Type Name' | Test-ValidStockIconName -ea Stop } |
-            Should throw 'not a valid'
-    }
-}
-
 Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
     Mock Get-ShellLibrary -Verifiable
     Mock Add-ShellLibrary -Verifiable
@@ -202,9 +183,8 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             Assert-MockCalled Get-ShellLibrary 1 { $Name -eq 'library name' }
             Assert-MockCalled Add-ShellLibrary 0 -Exactly
             Assert-MockCalled Remove-ShellLibrary 0 -Exactly
-            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'TypeName' }
+            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly
             Assert-MockCalled Get-StockIconReferencePath 0 -Exactly
-            Assert-MockCalled Set-ShellLibraryProperty 0 -Exactly -ParameterFilter { $PropertyName -eq 'IconReferencePath' }
         }
     }
     Context 'present, Set' {
