@@ -1,6 +1,6 @@
 function Invoke-ProcessPersistentItem
 {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = '__AllParameterSets')]
     param
     (
         [Parameter(Mandatory = $true,
@@ -21,24 +21,35 @@ function Invoke-ProcessPersistentItem
         [hashtable]
         $Keys,
 
-        [hashtable]
-        $Properties,
-
+        [Parameter(Mandatory = $true)]
         [string]
         $Getter,
 
+        [Parameter(Mandatory = $true)]
         [string]
         $Adder,
 
+        [Parameter(Mandatory = $true)]
         [string]
         $Remover,
 
+        [Parameter(ParameterSetName = 'with_properties',
+                   Mandatory = $true)]
+        [hashtable]
+        $Properties,
+
+        [Parameter(ParameterSetName = 'with_properties',
+                   Mandatory = $true)]
         [string]
         $PropertyGetter,
 
+        [Parameter(ParameterSetName = 'with_properties',
+                   Mandatory = $true)]
         [string]
         $PropertySetter,
 
+        [Parameter(ParameterSetName = 'with_properties',
+                   Mandatory = $true)]
         [string]
         $PropertyNormalizer
     )
@@ -74,6 +85,16 @@ function Invoke-ProcessPersistentItem
                     'Test' { return -not $item }
                 }
             }
+        }
+
+        if ( $PSCmdlet.ParameterSetName -ne 'with_properties' )
+        {
+            # we are not processing properties
+            if ( $Mode -eq 'Test' )
+            {
+                return $true
+            }
+            return
         }
 
         # process the item's properties

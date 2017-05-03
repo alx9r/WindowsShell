@@ -74,8 +74,8 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
                 $Mode -eq 'Set' -and
                 $Ensure -eq 'Present' -and
                 $Keys.Name -eq 'name' -and
-                
-                #Properties 
+
+                #Properties
                 $Properties.Count -eq 0
             }
         }

@@ -20,6 +20,11 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
         PropertySetter = 'Set-PersistentItemProperty'
         PropertyNormalizer = 'Get-NormalizedPersistentItemProperty'
     }
+    $coreDelegates = @{
+        Getter = 'Get-PersistentItem'
+        Adder = 'Add-PersistentItem'
+        Remover = 'Remove-PersistentItem'
+    }
 
     Context '-Ensure Present: absent, Set' {
         Mock Add-PersistentItem { 'item' }
@@ -45,10 +50,26 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             }
         }
     }
-
+    Context '-Ensure Present: absent, Set - omitting properties skips setting properties' {
+        Mock Add-PersistentItem { 'item' }
+        It 'returns nothing' {
+            $splat = @{ Keys = @{ Key = 'key value' } }
+            $r = Invoke-ProcessPersistentItem Set Present @splat @coreDelegates
+            $r | Should beNullOrEmpty
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-PersistentItem 1 { $Key -eq 'key value' }
+            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Invoke-ProcessPersistentItemProperty 0 -Exactly
+        }
+    }
     Context '-Ensure Present: absent, Test' {
         It 'returns false' {
-            $splat = @{ Keys = @{ Key = 'key value' } }
+            $splat = @{
+                Keys = @{ Key = 'key value' }
+                Properties = @{}
+            }
             $r = Invoke-ProcessPersistentItem Test Present @splat @delegates
             $r | Should be $false
         }
@@ -62,7 +83,10 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
     Context '-Ensure Present: present, Set' {
         Mock Get-PersistentItem { 'item' } -Verifiable
         It 'returns nothing' {
-            $splat = @{ Keys = @{ Key = 'key value' } }
+            $splat = @{
+                Keys = @{ Key = 'key value' }
+                Properties = @{}
+            }
             $r = Invoke-ProcessPersistentItem Set Present @splat @delegates
             $r | Should beNullOrEmpty
         }
@@ -77,8 +101,11 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
         Mock Get-PersistentItem { 'item' } -Verifiable
         Mock Invoke-ProcessPersistentItemProperty { 'property test result' } -Verifiable
         It 'returns result of properties test' {
-            $splat = @{ Keys = @{ Key = 'key value' } }
-            $r = Invoke-ProcessPersistentItem Set Present @splat @delegates
+            $splat = @{
+                Keys = @{ Key = 'key value' }
+                Properties = @{}
+            }
+            $r = Invoke-ProcessPersistentItem Test Present @splat @delegates
             $r | Should be 'property test result'
         }
         It 'correctly invokes functions' {
@@ -88,9 +115,26 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 1
         }
     }
+    Context '-Ensure Present: present, Test - omitting properties skips setting properties' {
+        Mock Get-PersistentItem { 'item' } -Verifiable
+        It 'returns result of properties test' {
+            $splat = @{ Keys = @{ Key = 'key value' } }
+            $r = Invoke-ProcessPersistentItem Test Present @splat @coreDelegates
+            $r | Should be $true
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-PersistentItem 0 -Exactly
+            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Invoke-ProcessPersistentItemProperty 0 -Exactly
+        }
+    }
     Context '-Ensure Absent: absent, Set' {
         It 'returns nothing' {
-            $splat = @{ Keys = @{ Key = 'key value' } }
+            $splat = @{
+                Keys = @{ Key = 'key value' }
+                Properties = @{}
+            }
             $r = Invoke-ProcessPersistentItem Set Absent @splat @delegates
             $r | Should beNullOrEmpty
         }
@@ -103,7 +147,10 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
     }
     Context '-Ensure Absent: absent, Test' {
         It 'returns true' {
-            $splat = @{ Keys = @{ Key = 'key value' } }
+            $splat = @{
+                Keys = @{ Key = 'key value' }
+                Properties = @{}
+            }
             $r = Invoke-ProcessPersistentItem Test Absent @splat @delegates
             $r | Should be $true
         }
@@ -117,7 +164,10 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
     Context '-Ensure Absent: present, Set' {
         Mock Get-PersistentItem { 'item' } -Verifiable
         It 'returns nothing' {
-            $splat = @{ Keys = @{ Key = 'key value' } }
+            $splat = @{
+                Keys = @{ Key = 'key value' }
+                Properties = @{}
+            }
             $r = Invoke-ProcessPersistentItem Set Absent @splat @delegates
             $r | Should beNullOrEmpty
         }
@@ -131,7 +181,10 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
     Context '-Ensure Absent: present, Test' {
         Mock Get-PersistentItem { 'item' } -Verifiable
         It 'returns false' {
-            $splat = @{ Keys = @{ Key = 'key value' } }
+            $splat = @{
+                Keys = @{ Key = 'key value' }
+                Properties = @{}
+            }
             $r = Invoke-ProcessPersistentItem Test Absent @splat @delegates
             $r | Should be $false
         }

@@ -32,50 +32,17 @@ function Invoke-ProcessShellLibraryFolder
     )
     process
     {
-        if ( -not (Test-ShellLibrary $LibraryName) )
-        {
-            # the library doesn't exist
-            if ( $Mode -eq 'Set' )
-            {
-                return
+        $splat = @{
+            Mode = $Mode
+            Ensure = $Ensure
+            Keys = @{
+                LibraryName = $LibraryName
+                FolderPath = $FolderPath
             }
-            return $false
+            Getter  = 'Get-ShellLibraryFolder'
+            Adder   = 'Add-ShellLibraryFolder'
+            Remover = 'Remove-ShellLibraryFolder'
         }
-
-        $folderExists = $FolderPath | Test-ShellLibraryFolder $LibraryName
-
-        switch ( $Ensure )
-        {
-            'Present' {
-                if ( -not $folderExists )
-                {
-                    switch ( $Mode )
-                    {
-                        'Set' { $FolderPath | Add-ShellLibraryFolder $LibraryName } # create the folder
-                        'Test' { return $false }                                    # the folder doesn't exist
-                    }
-                }
-                switch ( $Mode )
-                {
-                    'Set' {}
-                    'Test' { return $true } # the folder exists
-                }
-            }
-            'Absent' {
-                switch ( $Mode )
-                {
-                    'Set' {
-                        if ( $folderExists )
-                        {
-                            # the library exists, remove it
-                            $FolderPath | Remove-ShellLibraryFolder $LibraryName
-                        }
-                    }
-                    'Test' {
-                        return -not $folderExists
-                    }
-                }
-            }
-        }
+        Invoke-ProcessPersistentItem @splat
     }
 }

@@ -71,6 +71,33 @@ function Test-ShellLibraryFolder
     }
 }
 
+function Get-ShellLibraryFolder
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true)]
+        [ValidateScript({ $_ | Test-ValidFilePath })]
+        $FolderPath,
+
+        [Parameter(Mandatory = $true,
+                   Position = 1)]
+        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
+        $LibraryName
+    )
+    process
+    {
+        if ( $FolderPath | Test-ShellLibraryFolder $LibraryName )
+        {
+            return New-Object ShellLibraryFolderInfo -Property @{
+                LibraryName = $LibraryName
+                FolderPath = $FolderPath
+            }
+        }
+    }
+}
+
 function Add-ShellLibraryFolder
 {
     [CmdletBinding()]
