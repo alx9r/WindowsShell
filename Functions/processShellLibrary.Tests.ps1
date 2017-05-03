@@ -21,7 +21,7 @@ Describe Test-ValidShellLibraryTypeName {
     }
 }
 
-Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
+Describe 'Invoke-ProcessShellLibrary' {
     Mock Get-IconReferencePath -Verifiable
     Mock Invoke-ProcessPersistentItem { 'return value' } -Verifiable
     Context 'plumbing' {
@@ -49,7 +49,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             Assert-MockCalled Invoke-ProcessPersistentItem 1 {
                 $Mode -eq 'Set' -and
                 $Ensure -eq 'Present' -and
-                $Keys.Name -eq 'name' -and
+                $_Keys.Name -eq 'name' -and
 
                 #Properties
                 $Properties.TypeName -eq 'Pictures' -and
@@ -73,7 +73,7 @@ Describe 'Invoke-ProcessShellLibrary -Ensure Present' {
             Assert-MockCalled Invoke-ProcessPersistentItem 1 {
                 $Mode -eq 'Set' -and
                 $Ensure -eq 'Present' -and
-                $Keys.Name -eq 'name' -and
+                $_Keys.Name -eq 'name' -and
 
                 #Properties
                 $Properties.Count -eq 0

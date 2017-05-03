@@ -36,7 +36,7 @@ Describe 'Invoke-ProcessShortcut' {
             Assert-MockCalled Invoke-ProcessPersistentItem 1 {
                 $Mode -eq 'Set' -and
                 $Ensure -eq 'Present' -and
-                $Keys.Path -eq 'path' -and
+                $_Keys.Path -eq 'path' -and
 
                 #Properties
                 $Properties.TargetPath -eq 'target path' -and
@@ -64,7 +64,7 @@ Describe 'Invoke-ProcessShortcut' {
             Assert-MockCalled Invoke-ProcessPersistentItem 1 {
                 $Mode -eq 'Set' -and
                 $Ensure -eq 'Present' -and
-                $Keys.Path -eq 'path' -and
+                $_Keys.Path -eq 'path' -and
 
                 #Properties
                 $Properties.Count -eq 0

@@ -18,8 +18,9 @@ function Invoke-ProcessPersistentItem
                    Position = 3,
                    ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
+        [Alias('Keys')]
         [hashtable]
-        $Keys,
+        $_Keys,  # https://github.com/pester/Pester/issues/776
 
         [Parameter(Mandatory = $true)]
         [string]
@@ -56,7 +57,7 @@ function Invoke-ProcessPersistentItem
     process
     {
         # retrieve the item
-        $item = & $Getter @Keys
+        $item = & $Getter @_Keys
 
         # process item existence
         switch ( $Ensure )
@@ -67,7 +68,7 @@ function Invoke-ProcessPersistentItem
                     # add the item
                     switch ( $Mode )
                     {
-                        'Set'  { $item = & $Adder @Keys } # create the item
+                        'Set'  { $item = & $Adder @_Keys } # create the item
                         'Test' { return $false }              # the item doesn't exist
                     }
                 }
@@ -78,7 +79,7 @@ function Invoke-ProcessPersistentItem
                     'Set'  {
                         if ( $item )
                         {
-                            & $Remover @Keys | Out-Null
+                            & $Remover @_Keys | Out-Null
                         }
                         return
                     }
@@ -100,7 +101,7 @@ function Invoke-ProcessPersistentItem
         # process the item's properties
         $splat = @{
             Mode = $Mode
-            Keys = $Keys
+            Keys = $_Keys
             Properties = $Properties
             PropertyGetter = $PropertyGetter
             PropertySetter = $PropertySetter
@@ -121,8 +122,9 @@ function Invoke-ProcessPersistentItemProperty
         $Mode,
 
         [Parameter(Mandatory = $true)]
+        [Alias('Keys')]
         [hashtable]
-        $Keys,
+        $_Keys, # https://github.com/pester/Pester/issues/776
 
         [hashtable]
         $Properties,
@@ -151,7 +153,7 @@ function Invoke-ProcessPersistentItemProperty
             $normalized = & $PropertyNormalizer -PropertyName $propertyName -Value $desired
 
             # get the existing value
-            $existing = & $PropertyGetter @Keys -PropertyName $propertyName
+            $existing = & $PropertyGetter @_Keys -PropertyName $propertyName
 
             if ( $existing -ne $normalized )
             {
@@ -163,7 +165,7 @@ function Invoke-ProcessPersistentItemProperty
 
                 # the existing property does not match the desired property
                 # so fix it
-                & $PropertySetter @Keys -PropertyName $propertyName -Value $desired |
+                & $PropertySetter @_Keys -PropertyName $propertyName -Value $desired |
                     Out-Null
             }
         }
