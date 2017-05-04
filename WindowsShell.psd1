@@ -7,7 +7,7 @@ NestedModules = 'ShellLibrary.psm1','ShellLibraryFolder.psm1','Shortcut.psm1'
 DscResourcesToExport = '*'
 
 # Version number of this module.
-ModuleVersion = '0.2.0'
+ModuleVersion = '0.2.1'
 
 # ID used to uniquely identify this module
 GUID = '31eacef0-4fab-41fd-ac9e-6c65b0098e1f'
