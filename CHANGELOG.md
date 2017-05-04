@@ -1,4 +1,7 @@
-## 0.1.2
+## 0.2.0 (2017-05-03)
+ - implement Shortcut commands
+ - implement Shortcut DSC resource
+ - refactor so that all Invoke-Process* commands use the same algorithm
 
 ## 0.1.1 (2017-01-18)
  - fix problems handling UNC paths
