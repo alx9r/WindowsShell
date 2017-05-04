@@ -1,3 +1,5 @@
+## 0.2.1
+
 ## 0.2.0 (2017-05-03)
  - implement Shortcut commands
  - implement Shortcut DSC resource
