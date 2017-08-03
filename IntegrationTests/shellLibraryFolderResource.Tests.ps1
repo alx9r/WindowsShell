@@ -9,7 +9,8 @@ Describe 'ShellLibraryFolder Resource' {
     $h = @{}
     It 'is available using Get-DscResource' {
         $r = Get-DscResource ShellLibraryFolder WindowsShell
-        $r.Name | Should be 'ShellLibraryFolder'
+        $r | Should not beNullOrEmpty
+        $r| Select -First 1 | % Name | Should be 'ShellLibraryFolder'
     }
     Context 'set up' {
         It 'load module' {
@@ -22,7 +23,8 @@ Describe 'ShellLibraryFolder Resource' {
         }
         It 'create file system folders' {
             $folderPath1,$folderPath2 | % { New-Item $_ -ItemType Directory -ea Stop }
-            $folderPath1,$folderPath2 | Test-Path -PathType Container | Should be $true
+            $folderPath1,$folderPath2 | Test-Path -PathType Container |
+                %{ $_ | Should be $true }
         }
         It 'create the library' {
             $libraryName | Invoke-ProcessShellLibrary Set

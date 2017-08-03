@@ -7,7 +7,8 @@ Describe 'ShellLibrary Resource' {
     $h = @{}
     It 'is available using Get-DscResource' {
         $r = Get-DscResource ShellLibrary WindowsShell
-        $r.Name | Should be 'ShellLibrary'
+        $r | Should not beNullOrEmpty
+        $r | Select -First 1 | % Name | Should be 'ShellLibrary'
     }
     It 'load module' {
         $h.m = Import-Module "$((Get-Module WindowsShell).ModuleBase)\ShellLibrary.psm1" -PassThru
