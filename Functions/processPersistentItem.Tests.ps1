@@ -2,31 +2,31 @@ Import-Module WindowsShell -Force
 
 InModuleScope WindowsShell {
 
-function Get-PersistentItem    { param ($Key) }
-function Add-PersistentItem    { param ($Key) }
-function Remove-PersistentItem { param ($Key) }
+function Get-Item    { param ($Key) }
+function Add-Item    { param ($Key) }
+function Remove-Item { param ($Key) }
 
 Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
-    Mock Get-PersistentItem -Verifiable
-    Mock Add-PersistentItem -Verifiable
-    Mock Remove-PersistentItem { 'junk' } -Verifiable
+    Mock Get-Item -Verifiable
+    Mock Add-Item -Verifiable
+    Mock Remove-Item { 'junk' } -Verifiable
     Mock Invoke-ProcessPersistentItemProperty -Verifiable
 
     $delegates = @{
-        Getter = 'Get-PersistentItem'
-        Adder = 'Add-PersistentItem'
-        Remover = 'Remove-PersistentItem'
+        Getter = 'Get-Item'
+        Adder = 'Add-Item'
+        Remover = 'Remove-Item'
         PropertySetter = 'Set-Property'
         PropertyTester = 'Test-Property'
     }
     $coreDelegates = @{
-        Getter = 'Get-PersistentItem'
-        Adder = 'Add-PersistentItem'
-        Remover = 'Remove-PersistentItem'
+        Getter = 'Get-Item'
+        Adder = 'Add-Item'
+        Remover = 'Remove-Item'
     }
 
     Context '-Ensure Present: absent, Set' {
-        Mock Add-PersistentItem { 'item' }
+        Mock Add-Item { 'item' }
         It 'returns nothing' {
             $splat = @{
                 Keys = @{ Key = 'key value' }
@@ -36,9 +36,9 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             $r | Should beNullOrEmpty
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Remove-Item 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 1 {
                 $Mode -eq 'Set' -and
                 $_Keys.Key -eq 'key value' -and
@@ -49,16 +49,16 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
         }
     }
     Context '-Ensure Present: absent, Set - omitting properties skips setting properties' {
-        Mock Add-PersistentItem { 'item' }
+        Mock Add-Item { 'item' }
         It 'returns nothing' {
             $splat = @{ Keys = @{ Key = 'key value' } }
             $r = Invoke-ProcessPersistentItem Set Present @splat @coreDelegates
             $r | Should beNullOrEmpty
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Remove-Item 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 0 -Exactly
         }
     }
@@ -72,14 +72,14 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             $r | Should be $false
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 0 -Exactly
-            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 0 -Exactly
+            Assert-MockCalled Remove-Item 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 0 -Exactly
         }
     }
     Context '-Ensure Present: present, Set' {
-        Mock Get-PersistentItem { 'item' } -Verifiable
+        Mock Get-Item { 'item' } -Verifiable
         It 'returns nothing' {
             $splat = @{
                 Keys = @{ Key = 'key value' }
@@ -89,14 +89,14 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             $r | Should beNullOrEmpty
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 0 -Exactly
-            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 0 -Exactly
+            Assert-MockCalled Remove-Item 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 1
         }
     }
     Context '-Ensure Present: present, Test' {
-        Mock Get-PersistentItem { 'item' } -Verifiable
+        Mock Get-Item { 'item' } -Verifiable
         Mock Invoke-ProcessPersistentItemProperty { 'property test result' } -Verifiable
         It 'returns result of properties test' {
             $splat = @{
@@ -107,23 +107,23 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             $r | Should be 'property test result'
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 0 -Exactly
-            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 0 -Exactly
+            Assert-MockCalled Remove-Item 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 1
         }
     }
     Context '-Ensure Present: present, Test - omitting properties skips setting properties' {
-        Mock Get-PersistentItem { 'item' } -Verifiable
+        Mock Get-Item { 'item' } -Verifiable
         It 'returns result of properties test' {
             $splat = @{ Keys = @{ Key = 'key value' } }
             $r = Invoke-ProcessPersistentItem Test Present @splat @coreDelegates
             $r | Should be $true
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 0 -Exactly
-            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 0 -Exactly
+            Assert-MockCalled Remove-Item 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 0 -Exactly
         }
     }
@@ -137,9 +137,9 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             $r | Should beNullOrEmpty
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 0 -Exactly
-            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 0 -Exactly
+            Assert-MockCalled Remove-Item 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 0 -Exactly
         }
     }
@@ -153,14 +153,14 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             $r | Should be $true
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 0 -Exactly
-            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 0 -Exactly
+            Assert-MockCalled Remove-Item 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 0 -Exactly
         }
     }
     Context '-Ensure Absent: present, Set' {
-        Mock Get-PersistentItem { 'item' } -Verifiable
+        Mock Get-Item { 'item' } -Verifiable
         It 'returns nothing' {
             $splat = @{
                 Keys = @{ Key = 'key value' }
@@ -170,14 +170,14 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             $r | Should beNullOrEmpty
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 0 -Exactly
-            Assert-MockCalled Remove-PersistentItem 1 { $Key -eq 'key value' }
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 0 -Exactly
+            Assert-MockCalled Remove-Item 1 { $Key -eq 'key value' }
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 0 -Exactly
         }
     }
     Context '-Ensure Absent: present, Test' {
-        Mock Get-PersistentItem { 'item' } -Verifiable
+        Mock Get-Item { 'item' } -Verifiable
         It 'returns false' {
             $splat = @{
                 Keys = @{ Key = 'key value' }
@@ -187,9 +187,9 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
             $r | Should be $false
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-PersistentItem 1 { $Key -eq 'key value' }
-            Assert-MockCalled Add-PersistentItem 0 -Exactly
-            Assert-MockCalled Remove-PersistentItem 0 -Exactly
+            Assert-MockCalled Get-Item 1 { $Key -eq 'key value' }
+            Assert-MockCalled Add-Item 0 -Exactly
+            Assert-MockCalled Remove-Item 0 -Exactly
             Assert-MockCalled Invoke-ProcessPersistentItemProperty 0 -Exactly
         }
     }
