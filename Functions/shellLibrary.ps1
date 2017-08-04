@@ -235,25 +235,30 @@ function Set-ShellLibraryProperty
     }
 }
 
-function Get-NormalizedShellLibraryProperty
+function Test-ShellLibraryProperty
 {
     [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true,
-                   Position = 1)]
+                   ValueFromPipeline = $true,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string]
+        [Alias('Key','Name')]
+        $LibraryName,
+
+        [Parameter(Mandatory = $true,
+                   position = 1)]
+        [ValidateSet('TypeName','IconReferencePath')]
         [string]
         $PropertyName,
 
         [Parameter(Mandatory = $true,
-                   Position = 2,
-                   ValueFromPipeline = $true)]
-        [AllowNull()]
-        [AllowEmptyString()]
+                   position = 2)]
         $Value
     )
     process
     {
-        $Value
+        $Value -eq (Get-ShellLibraryProperty -LibraryName $LibraryName -PropertyName $PropertyName)
     }
 }

@@ -42,17 +42,13 @@ function Invoke-ProcessPersistentItem
         [Parameter(ParameterSetName = 'with_properties',
                    Mandatory = $true)]
         [string]
-        $PropertyGetter,
-
-        [Parameter(ParameterSetName = 'with_properties',
-                   Mandatory = $true)]
-        [string]
         $PropertySetter,
 
+
         [Parameter(ParameterSetName = 'with_properties',
                    Mandatory = $true)]
         [string]
-        $PropertyNormalizer
+        $PropertyTester
     )
     process
     {
@@ -103,9 +99,8 @@ function Invoke-ProcessPersistentItem
             Mode = $Mode
             Keys = $_Keys
             Properties = $Properties
-            PropertyGetter = $PropertyGetter
             PropertySetter = $PropertySetter
-            PropertyNormalizer = $PropertyNormalizer
+            PropertyTester = $PropertyTester
         }
         Invoke-ProcessPersistentItemProperty @splat
     }
@@ -131,15 +126,11 @@ function Invoke-ProcessPersistentItemProperty
 
         [Parameter(Mandatory = $true)]
         [string]
-        $PropertyGetter,
-
-        [Parameter(Mandatory = $true)]
-        [string]
         $PropertySetter,
 
         [Parameter(Mandatory = $true)]
         [string]
-        $PropertyNormalizer
+        $PropertyTester
     )
     process
     {
@@ -149,13 +140,10 @@ function Invoke-ProcessPersistentItemProperty
             # this is the desired value provided by the user
             $desired = $Properties.$propertyName
 
-            # normalize the desired value
-            $normalized = & $PropertyNormalizer -PropertyName $propertyName -Value $desired
+            # test for the desired value
+            $alreadyCorrect = & $PropertyTester @_Keys -PropertyName $propertyName -Value $desired
 
-            # get the existing value
-            $existing = & $PropertyGetter @_Keys -PropertyName $propertyName
-
-            if ( $existing -ne $normalized )
+            if ( -not $alreadyCorrect )
             {
                 if ( $Mode -eq 'Test' )
                 {

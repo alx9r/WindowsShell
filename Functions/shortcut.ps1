@@ -219,3 +219,31 @@ function Get-NormalizedShortcutProperty
         return $shortcut.$PropertyName
     }
 }
+
+function Test-ShortcutProperty
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+                   ValueFromPipeline = $true,
+                   ValueFromPipelineByPropertyName = $true)]
+        [string]
+        $Path,
+
+        [Parameter(Mandatory = $true,
+                   position = 1)]
+        [string]
+        $PropertyName,
+
+        [Parameter(Mandatory = $true,
+                   position = 2)]
+        $Value
+    )
+    process
+    {
+        $actualValue = Get-ShortcutProperty -Path $Path -PropertyName $PropertyName
+        $normalizedValue = Get-NormalizedShortcutProperty -PropertyName $PropertyName -Value $Value
+        return $actualValue -eq $normalizedValue
+    }
+}

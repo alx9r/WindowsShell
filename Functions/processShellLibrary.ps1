@@ -102,9 +102,8 @@ function Invoke-ProcessShellLibrary
             Getter  = 'Get-ShellLibrary'
             Adder   = 'Add-ShellLibrary'
             Remover = 'Remove-ShellLibrary'
-            PropertyGetter = 'Get-ShellLibraryProperty'
             PropertySetter = 'Set-ShellLibraryProperty'
-            PropertyNormalizer = 'Get-NormalizedShellLibraryProperty'
+            PropertyTester = 'Test-ShellLibraryProperty'
         }
         Invoke-ProcessPersistentItem @splat
     }
