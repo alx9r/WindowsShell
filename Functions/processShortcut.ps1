@@ -92,9 +92,8 @@ function Invoke-ProcessShortcut
             Getter  = 'Get-ShortCut'
             Adder   = 'Add-ShortCut'
             Remover = 'Remove-ShortCut'
-            PropertyGetter = 'Get-ShortCutProperty'
             PropertySetter = 'Set-ShortCutProperty'
-            PropertyNormalizer = 'Get-NormalizedShortCutProperty'
+            PropertyTest = 'Test-ShortCutProperty'
         }
         Invoke-ProcessPersistentItem @splat
     }
