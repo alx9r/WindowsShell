@@ -16,9 +16,8 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
         Getter = 'Get-PersistentItem'
         Adder = 'Add-PersistentItem'
         Remover = 'Remove-PersistentItem'
-        PropertyGetter = 'Get-PersistentItemProperty'
-        PropertySetter = 'Set-PersistentItemProperty'
-        PropertyNormalizer = 'Get-NormalizedPersistentItemProperty'
+        PropertySetter = 'Set-Property'
+        PropertyTester = 'Test-Property'
     }
     $coreDelegates = @{
         Getter = 'Get-PersistentItem'
@@ -44,9 +43,8 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
                 $Mode -eq 'Set' -and
                 $_Keys.Key -eq 'key value' -and
                 $Properties.P -eq 'P desired' -and
-                $PropertyGetter -eq 'Get-PersistentItemProperty' -and
-                $PropertySetter -eq 'Set-PersistentItemProperty' -and
-                $PropertyNormalizer -eq 'Get-NormalizedPersistentItemProperty'
+                $PropertySetter -eq 'Set-Property' -and
+                $PropertyTester -eq 'Test-Property'
             }
         }
     }
@@ -198,46 +196,38 @@ Describe 'Invoke-ProcessPersistentItem -Ensure Present: ' {
 }
 
 
-function Get-PersistentItemProperty           { param ($Key,$PropertyName) }
-function Set-PersistentItemProperty           { param ($Key,$PropertyName,$Value) }
-function Get-NormalizedPersistentItemProperty { param ($PropertyName,$Value) }
+function Set-Property { param ($Key,$PropertyName,$Value) }
+function Test-Property { param ($Key,$PropertyName,$Value) }
 
 Describe 'Invoke-ProcessPersistentItemProperty' {
-    Mock Get-NormalizedPersistentItemProperty -Verifiable
-    Mock Get-PersistentItemProperty -Verifiable
-    Mock Set-PersistentItemProperty { 'junk' } -Verifiable
+    Mock Set-Property { 'junk' } -Verifiable
+    Mock Test-Property { $true } -Verifiable
 
     $delegates = @{
-        PropertyGetter = 'Get-PersistentItemProperty'
-        PropertySetter = 'Set-PersistentItemProperty'
-        PropertyNormalizer = 'Get-NormalizedPersistentItemProperty'
+        PropertySetter = 'Set-Property'
+        PropertyTester = 'Test-Property'
     }
     Context 'Set, property already correct' {
-        Mock Get-NormalizedPersistentItemProperty { 'already correct' } -Verifiable
-        Mock Get-PersistentItemProperty { 'already correct' } -Verifiable
+        Mock Test-Property { $true } -Verifiable
         It 'returns nothing' {
             $splat = @{
                 Keys = @{ Key = 'key value' }
-                Properties = @{ P = 'already correct' }
+                Properties = @{ P = 'correct' }
             }
             $r = Invoke-ProcessPersistentItemProperty Set @splat @delegates
             $r | Should beNullOrEmpty
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-NormalizedPersistentItemProperty 1 {
-                $PropertyName -eq 'P' -and
-                $Value -eq 'already correct'
-            }
-            Assert-MockCalled Get-PersistentItemProperty 1 {
+            Assert-MockCalled Test-Property 1 {
                 $Key -eq 'key value' -and
-                $PropertyName -eq 'P'
+                $PropertyName -eq 'P' -and
+                $Value -eq 'correct'
             }
-            Assert-MockCalled Set-PersistentItemProperty 0 -Exactly
+            Assert-MockCalled Set-Property 0 -Exactly
         }
     }
     Context 'Test, property correct' {
-        Mock Get-NormalizedPersistentItemProperty { 'correct' } -Verifiable
-        Mock Get-PersistentItemProperty { 'correct' } -Verifiable
+        Mock Test-Property { $true } -Verifiable
         It 'returns true' {
             $splat = @{
                 Keys = @{ Key = 'key value' }
@@ -247,20 +237,16 @@ Describe 'Invoke-ProcessPersistentItemProperty' {
             $r | Should be $true
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-NormalizedPersistentItemProperty 1 {
+            Assert-MockCalled Test-Property 1 {
+                $Key -eq 'key value' -and
                 $PropertyName -eq 'P' -and
                 $Value -eq 'correct'
             }
-            Assert-MockCalled Get-PersistentItemProperty 1 {
-                $Key -eq 'key value' -and
-                $PropertyName -eq 'P'
-            }
-            Assert-MockCalled Set-PersistentItemProperty 0 -Exactly
+            Assert-MockCalled Set-Property 0 -Exactly
         }
     }
     Context 'Set, correcting property' {
-        Mock Get-NormalizedPersistentItemProperty { 'normalized' } -Verifiable
-        Mock Get-PersistentItemProperty { 'original' } -Verifiable
+        Mock Test-Property { $false } -Verifiable
         It 'returns nothing' {
             $splat = @{
                 Keys = @{ Key = 'key value' }
@@ -270,15 +256,12 @@ Describe 'Invoke-ProcessPersistentItemProperty' {
             $r | Should beNullOrEmpty
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-NormalizedPersistentItemProperty 1 {
+            Assert-MockCalled Set-Property 1 -Exactly {
+                $Key -eq 'key value' -and
                 $PropertyName -eq 'P' -and
                 $Value -eq 'desired'
             }
-            Assert-MockCalled Get-PersistentItemProperty 1 {
-                $Key -eq 'key value' -and
-                $PropertyName -eq 'P'
-            }
-            Assert-MockCalled Set-PersistentItemProperty 1 -Exactly {
+            Assert-MockCalled Set-Property 1 -Exactly {
                 $Key -eq 'key value' -and
                 $PropertyName -eq 'P' -and
                 $Value -eq 'desired'
@@ -286,8 +269,7 @@ Describe 'Invoke-ProcessPersistentItemProperty' {
         }
     }
     Context 'Test, property incorrect' {
-        Mock Get-NormalizedPersistentItemProperty { 'normalized' } -Verifiable
-        Mock Get-PersistentItemProperty { 'original' } -Verifiable
+        Mock Test-Property { $false } -Verifiable
         It 'returns false' {
             $splat = @{
                 Keys = @{ Key = 'key value' }
@@ -297,15 +279,12 @@ Describe 'Invoke-ProcessPersistentItemProperty' {
             $r | Should be $false
         }
         It 'correctly invokes functions' {
-            Assert-MockCalled Get-NormalizedPersistentItemProperty 1 {
+            Assert-MockCalled Test-Property 1 {
+                $Key -eq 'key value' -and
                 $PropertyName -eq 'P' -and
                 $Value -eq 'desired'
             }
-            Assert-MockCalled Get-PersistentItemProperty 1 {
-                $Key -eq 'key value' -and
-                $PropertyName -eq 'P'
-            }
-            Assert-MockCalled Set-PersistentItemProperty 0 -Exactly
+            Assert-MockCalled Set-Property 0 -Exactly
         }
     }
 }
