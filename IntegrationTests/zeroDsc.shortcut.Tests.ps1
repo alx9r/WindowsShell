@@ -3,7 +3,7 @@ if ( -not (Get-Module ZeroDsc -ListAvailable) )
     return
 }
 
-Remove-Module WindowsShell -fo -ea si; Import-Module WindowsShell
+Import-Module WindowsShell -Force
 Import-Module PSDesiredStateConfiguration, ZeroDsc
 
 Describe 'Invoke with ZeroDsc (Shortcut)' {

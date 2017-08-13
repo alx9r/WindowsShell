@@ -17,7 +17,6 @@ function Invoke-ProcessShellLibraryFolder
         [Parameter(Mandatory = $true,
                    Position = 3,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
         [Alias('Name')]
         [string]
         $LibraryName,
@@ -26,12 +25,15 @@ function Invoke-ProcessShellLibraryFolder
                    Position = 4,
                    ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateScript({ $_ | Test-ValidFilePath })]
         [string]
         $FolderPath
     )
     process
     {
+        # validate parameters
+        $LibraryName | ? {$_} | Test-ValidShellLibraryName -ea Stop | Out-Null
+        $FolderPath | ? {$_} | Test-ValidFilePath -ea Stop | Out-Null
+
         $splat = @{
             Mode = $Mode
             Ensure = $Ensure

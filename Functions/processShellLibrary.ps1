@@ -46,7 +46,6 @@ function Invoke-ProcessShellLibrary
                    Position = 3,
                    ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
         [Alias('LibraryName')]
         [string]
         $Name,
@@ -70,6 +69,7 @@ function Invoke-ProcessShellLibrary
     process
     {
         # validate parameters
+        $Name | ? {$_} | Test-ValidShellLibraryName -ea Stop | Out-Null
         $IconFilePath | ? {$_} | Test-ValidFilePath -ea Stop | Out-Null
         $TypeName | ? {$_} | Test-ValidShellLibraryTypeName -ea Stop | Out-Null
         $StockIconName | ? {$_} | Test-ValidStockIconName -ea Stop | Out-Null
