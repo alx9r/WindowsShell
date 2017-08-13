@@ -233,6 +233,11 @@ function Test-ProcessFunction
                         ? {$_.TypeId.Name -eq 'ValidateScriptAttribute'} 
                     $r | Should beNullOrEmpty
                 }
+                It 'does not have a type' {
+                    $r = $function.ScriptBlock.Ast.Body.ParamBlock.Parameters.
+                        Where({$_.Name.VariablePath.UserPath -eq $parameter.Name}).StaticType
+                    $r | Should be ([Object])
+                }
             }
         }
     }

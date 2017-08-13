@@ -85,8 +85,8 @@ Describe 'Invoke with ZeroDsc (ShellLibrary)' {
             Test-Path $folderPath | Should be $false
         }
         It 'remove the libraries' {
-            $libraryName1,$libraryName2 | Invoke-ProcessShellLibrary Set Absent
-            ( $libraryName1,$libraryName2 | Invoke-ProcessShellLibrary Test Absent ) -ne
+            $libraryName1,$libraryName2 |  % { Invoke-ProcessShellLibrary Set Absent -Name $_ }
+            ( $libraryName1,$libraryName2 | % { Invoke-ProcessShellLibrary Test Absent -Name $_ } ) -ne
                 $true |
                 Should beNullOrEmpty
         }

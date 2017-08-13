@@ -27,8 +27,8 @@ Describe 'ShellLibraryFolder Resource' {
                 %{ $_ | Should be $true }
         }
         It 'create the library' {
-            $libraryName | Invoke-ProcessShellLibrary Set
-            $r = $libraryName | Invoke-ProcessShellLibrary Test
+            Invoke-ProcessShellLibrary Set -Name $libraryName
+            $r = Invoke-ProcessShellLibrary Test -Name $libraryName
             $r | Should be $true
         }
     }
@@ -86,8 +86,8 @@ Describe 'ShellLibraryFolder Resource' {
             Test-Path $folderPath1 | Should be $false
         }
         It 'remove the library' {
-            $libraryName | Invoke-ProcessShellLibrary Set Absent
-            $r = $libraryName | Invoke-ProcessShellLibrary Test Absent
+            Invoke-ProcessShellLibrary Set Absent -Name $libraryName
+            $r = Invoke-ProcessShellLibrary Test Absent -Name $libraryName
             $r | Should be $true
         }
     }

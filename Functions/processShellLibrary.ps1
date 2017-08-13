@@ -44,26 +44,20 @@ function Invoke-ProcessShellLibrary
 
         [Parameter(Mandatory = $true,
                    Position = 3,
-                   ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
         [Alias('LibraryName')]
-        [string]
         $Name,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
         $TypeName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
         $StockIconName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
         $IconFilePath,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [int]
         $IconResourceId=0
     )
     process
