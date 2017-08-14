@@ -18,14 +18,12 @@ Describe 'Invoke with ZeroDsc (ShellLibrary)' {
         }
     }
     Context ShellLibrary {
-        $document = [scriptblock]::Create(@"
-            Get-DscResource ShellLibrary WindowsShell | Import-DscResource
-            ShellLibrary MyLib @{ Name = '$libraryName1' }
-"@
-        )
         $h = @{}
         It 'create instructions' {
-            $h.i = ConfigInstructions SomeName $document
+            $h.i = ConfigInstructions SomeName {
+                Get-DscResource ShellLibrary WindowsShell | Import-DscResource
+                ShellLibrary MyLib @{ Name = $libraryName1 }
+            }
         }
         foreach ( $step in $h.i )
         {
@@ -36,17 +34,15 @@ Describe 'Invoke with ZeroDsc (ShellLibrary)' {
         }
     }
     Context ShellLibraryFolder {
-        $document = [scriptblock]::Create(@"
-            Get-DscResource ShellLibraryFolder WindowsShell | Import-DscResource
-            ShellLibraryFolder MyDir @{
-                LibraryName = '$libraryName1'
-                FolderPath = '$folderPath'
-            }
-"@
-        )
         $h = @{}
         It 'create instructions' {
-            $h.i = ConfigInstructions SomeName $document
+            $h.i = ConfigInstructions SomeName {
+                Get-DscResource ShellLibraryFolder WindowsShell | Import-DscResource
+                ShellLibraryFolder MyDir @{
+                    LibraryName = $libraryName1
+                    FolderPath = $folderPath
+                }
+            }
         }
         foreach ( $step in $h.i )
         {
@@ -57,19 +53,17 @@ Describe 'Invoke with ZeroDsc (ShellLibrary)' {
         }
     }
     Context 'combined' {
-        $document = [scriptblock]::Create(@"
-        Get-DscResource -Module WindowsShell | Import-DscResource
-        ShellLibraryFolder MyDir @{
-            LibraryName = '$libraryName2'
-            FolderPath = '$folderPath'
-            DependsOn = '[ShellLibrary]MyLib'
-        }
-        ShellLibrary MyLib @{ Name = '$libraryName2' }
-"@
-        )
-            $h = @{}
+        $h = @{}
         It 'create instructions' {
-            $h.i = ConfigInstructions SomeName $document
+            $h.i = ConfigInstructions SomeName {
+                Get-DscResource -Module WindowsShell | Import-DscResource
+                ShellLibraryFolder MyDir @{
+                    LibraryName = $libraryName2
+                    FolderPath = $folderPath
+                    DependsOn = '[ShellLibrary]MyLib'
+                }
+                ShellLibrary MyLib @{ Name = $libraryName2 }
+            }
         }
         foreach ( $step in $h.i )
         {

@@ -13,14 +13,14 @@ Describe 'Invoke with ZeroDsc (Shortcut)' {
     $shortcutPath = Join-Path $tempPath $shortcutFilename
 
     $tests = [ordered]@{
-        basic = @"
+        basic = {
             Get-DscResource Shortcut WindowsShell | Import-DscResource
-            Shortcut MyShortcut @{ Path = "$shortcutPath" }
-"@
-        full = @"
+            Shortcut MyShortcut @{ Path = $shortcutPath }
+        }
+        full = {
             Get-DscResource Shortcut WindowsShell | Import-DscResource
             Shortcut MyShortcut @{
-                Path = "$shortcutPath"
+                Path = $shortcutPath
                 Arguments = 'arguments'
                 Hotkey = 'Ctrl+Alt+f'
                 StockIconName = 'AudioFiles'
@@ -29,12 +29,12 @@ Describe 'Invoke with ZeroDsc (Shortcut)' {
                 WorkingDirectory = 'c:\temp'
                 Description = 'some description'
             }
-"@
+        }
     }
     foreach ( $testName in $tests.Keys )
     {
         Context $testName {
-            $document = [scriptblock]::Create($tests.$testName)
+            $document = $tests.$testName
             $h = @{}
             It 'create instructions' {
                 $h.i = ConfigInstructions SomeName $document
