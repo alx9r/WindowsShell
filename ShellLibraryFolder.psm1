@@ -1,9 +1,3 @@
-enum Ensure
-{
-    Present
-    Absent
-}
-
 [DscResource()]
 class ShellLibraryFolder
 {

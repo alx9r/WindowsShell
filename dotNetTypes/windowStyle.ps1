@@ -10,9 +10,12 @@ intWindowStyle  Description
 3               Activates the window and displays it as a maximized window.
 7               Minimizes the window and activates the next top-level window.
 #>
-enum WindowStyle
+
+Add-Type @'
+public enum WindowStyle
 {
-    Normal = 1
-    Maximized = 3
+    Normal = 1,
+    Maximized = 3,
     Minimized = 7
 }
+'@

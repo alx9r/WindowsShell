@@ -2,7 +2,14 @@
 
 # Script module or binary module file associated with this manifest.
 RootModule = 'WindowsShell.psm1'
-NestedModules = 'ShellLibrary.psm1','ShellLibraryFolder.psm1','Shortcut.psm1'
+NestedModules = 'Shortcut.psm1','ShellLibrary.psm1','ShellLibraryFolder.psm1'
+ScriptsToProcess = @(
+    '.\dotNetTypes\ensure.ps1'
+    '.\dotNetTypes\mode.ps1'
+    '.\dotNetTypes\libraryTypeName.ps1'
+    '.\dotNetTypes\stockIconName.ps1'
+    '.\dotNetTypes\windowStyle.ps1'
+)
 
 DscResourcesToExport = '*'
 

@@ -21,7 +21,8 @@ Describe 'Invoke with ZeroDsc (ShellLibrary)' {
         $h = @{}
         It 'create instructions' {
             $h.i = ConfigInstructions SomeName {
-                Get-DscResource ShellLibrary WindowsShell | Import-DscResource
+                $r = Get-DscResource ShellLibrary WindowsShell
+                $r | Import-DscResource
                 ShellLibrary MyLib @{ Name = $libraryName1 }
             }
         }

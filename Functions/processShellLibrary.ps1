@@ -34,12 +34,12 @@ function Invoke-ProcessShellLibrary
         [Parameter(Mandatory = $true,
                    Position = 1,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Set','Test')]
+        [Mode]
         $Mode,
 
         [Parameter(Position = 2,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Present','Absent')]
+        [Ensure]
         $Ensure = 'Present',
 
         [Parameter(Mandatory = $true,

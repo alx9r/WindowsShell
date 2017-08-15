@@ -149,11 +149,11 @@ function Test-ProcessFunction
         }
         $function = (Get-Module $ModuleName).ExportedFunctions.$FunctionName
         foreach ( $values in @(
-            @('Mode',   'design_requires', 'mandatory', $null,    1, @('Set','Test')),
-            @('Ensure', $null,             $null,       'Present',2, @('Present','Absent'))
+            @('Mode',   'design_requires', 'mandatory', $null,    1, 'Mode'),
+            @('Ensure', $null,             $null,       'Present',2, 'Ensure')
         ))
         {
-            $name,$designRequires,$mandatory,$defaultValue,$position,$validValues = $values
+            $name,$designRequires,$mandatory,$defaultValue,$position,$typeName = $values
 
             if ( $designRequires -or 
                  $function.Parameters.get_keys() -contains $name )
@@ -201,16 +201,9 @@ function Test-ProcessFunction
 
                     $actual | Should be $expected
                 }
-                It 'has a ValidateSet attribute' {
-                    $r = $function.Parameters.$name.Attributes | 
-                        ? {$_.TypeId.Name -eq 'ValidateSetAttribute' }
-                    $r | Should not beNullOrEmpty
-                }
-                It "valid values are $validValues" {
-                    $r = $function.Parameters.$name.Attributes | 
-                        ? {$_.TypeId.Name -eq 'ValidateSetAttribute' } |
-                        % ValidValues
-                    $r | Should be $validValues
+                It "is of type $typeName" {
+                    $r = $function.Parameters.$name.ParameterType
+                    $r | Should be $typeName
                 }
             }
             }
@@ -232,11 +225,6 @@ function Test-ProcessFunction
                     $r = $parameter.Attributes | 
                         ? {$_.TypeId.Name -eq 'ValidateScriptAttribute'} 
                     $r | Should beNullOrEmpty
-                }
-                It 'does not have a type' {
-                    $r = $function.ScriptBlock.Ast.Body.ParamBlock.Parameters.
-                        Where({$_.Name.VariablePath.UserPath -eq $parameter.Name}).StaticType
-                    $r | Should be ([Object])
                 }
             }
         }
@@ -275,7 +263,7 @@ function Test-ResourcePlumbing
     $function = (Get-Module $ModuleName).ExportedFunctions.$FunctionName
 
     Describe "resource object $ResourceName in module $ModuleName to function $FunctionName" {
-        It 'the member variables names and parameter names match' {
+        It 'the member variable and parameter names match' {
             $memberNames = Get-Member -InputObject $object -MemberType Property |
                 % Name |
                 Sort
@@ -285,15 +273,29 @@ function Test-ResourcePlumbing
                 Sort
             $memberNames | Should be $parameterNames
         }
+        Context 'the member and parameter types match' {
+            $members = $object.GetType().GetMembers() |
+                ? {$_.MemberType -eq 'Property' }
+            foreach ( $member in $members )
+            {
+                $name = $member.Name
+                It $name {
+                    $memberType = $member.PropertyType
+                    $parameterType = $function.Parameters.$name.ParameterType
+                    
+                    $memberType | Should be $parameterType
+                }
+            }
+        }
         
         # compose the parameters
         $parameters = @{}
         foreach ( $variable in $object.GetType().GetProperties() )
         {
-            # if it's an enum, use the zero value
+            # if it's an enum, use the first value
             if ( $variable.PropertyType.BaseType -eq [System.Enum] )
             {
-                $parameters.$($variable.Name) = 0
+                $parameters.$($variable.Name) = [System.Enum]::GetValues($variable.PropertyType)[0]
             }
             # if there is a default value, use it
             elseif ( $object.$($variable.Name)  )

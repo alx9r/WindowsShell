@@ -18,7 +18,7 @@ Describe 'Invoke-ProcessShortcut' {
                 WorkingDirectory = 'working directory'
                 WindowStyle = 'Normal'
                 Hotkey = 'hotkey'
-                StockIconName = 'stock icon name'
+                StockIconName = 'Folder'
                 IconFilePath = 'icon file path'
                 IconResourceId = 1
                 Description = 'description'
@@ -29,7 +29,7 @@ Describe 'Invoke-ProcessShortcut' {
         }
         It 'correctly invokes functions' {
             Assert-MockCalled Get-IconReferencePath 1 {
-                $StockIconName -eq 'stock icon name' -and
+                $StockIconName -eq 'Folder' -and
                 $IconFilePath -eq 'icon file path' -and
                 $IconResourceId -eq 1
             }
