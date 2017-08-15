@@ -37,7 +37,7 @@ function Invoke-ProcessShortcut
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('Run')]
-        [WindowStyle]
+        [System.Nullable[WindowStyle]]
         $WindowStyle,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
@@ -46,7 +46,7 @@ function Invoke-ProcessShortcut
         $Hotkey,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [StockIconName]
+        [System.Nullable[StockIconName]]
         $StockIconName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
@@ -55,7 +55,7 @@ function Invoke-ProcessShortcut
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [int]
-        $IconResourceId=0,
+        $IconResourceId,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('Comment')]
@@ -68,7 +68,7 @@ function Invoke-ProcessShortcut
         $properties = @{}
         'TargetPath','Arguments','WorkingDirectory',
         'WindowStyle','Hotkey','Description' |
-            ? { $_ -in $PSCmdlet.MyInvocation.BoundParameters.Keys } |
+            ? { Get-Variable $_ -ValueOnly } |
             % { $properties.$_ = Get-Variable $_ -ValueOnly }
 
 

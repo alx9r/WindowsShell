@@ -10,12 +10,12 @@ class ShellLibrary
     $Ensure
 
     [DscProperty()]
-    [LibraryTypeName]
-    $TypeName = [LibraryTypeName]::DoNotSet
+    [System.Nullable[LibraryTypeName]]
+    $TypeName
 
     [DscProperty()]
-    [StockIconName]
-    $StockIconName = [StockIconName]::DoNotSet
+    [System.Nullable[StockIconName]]
+    $StockIconName
 
     [DscProperty()]
     [string]

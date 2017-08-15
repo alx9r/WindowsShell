@@ -45,19 +45,24 @@ function Invoke-ProcessShellLibrary
         [Parameter(Mandatory = $true,
                    Position = 3,
                    ValueFromPipelineByPropertyName = $true)]
+        [string]
         [Alias('LibraryName')]
         $Name,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [System.Nullable[LibraryTypeName]]
         $TypeName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [System.Nullable[StockIconName]]
         $StockIconName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [string]
         $IconFilePath,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [int]
         $IconResourceId=0
     )
     process
@@ -71,8 +76,7 @@ function Invoke-ProcessShellLibrary
         # pass through properties
         $properties = @{}
         'TypeName' |
-            ? { $_ -in $PSCmdlet.MyInvocation.BoundParameters.Keys } |
-            ? { (Get-Variable $_ -ValueOnly) -ne 'DoNotSet' } |
+            ? { $null -ne (Get-Variable $_ -ValueOnly) } |
             % { $properties.$_ = Get-Variable $_ -ValueOnly }
 
 

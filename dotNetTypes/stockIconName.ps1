@@ -11,8 +11,6 @@ public enum StockIconName
     MediaBluRay, MediaVcd, MediaDvdPlusR, MediaDvdPlusRW, DesktopPC, MobilePC, Users, MediaSmartMedia, 
     MediaCompactFlash, DeviceCellPhone, DeviceCamera, DeviceVideoCamera, DeviceAudioPlayer, NetworkConnect, Internet, 
     ZipFile, Settings, DriveHDDVD, DriveBluRay, MediaHDDVDROM, MediaHDDVDR, MediaHDDVDRAM, MediaBluRayROM, 
-    MediaBluRayR, MediaBluRayRE, ClusteredDisk,
-
-    DoNotSet
+    MediaBluRayR, MediaBluRayRE, ClusteredDisk
 }
 '@

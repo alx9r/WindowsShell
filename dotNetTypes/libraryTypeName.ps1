@@ -5,8 +5,6 @@ public enum LibraryTypeName
     Documents,
     Music,
     Pictures,
-    Videos,
-
-    DoNotSet
+    Videos
 }
 '@

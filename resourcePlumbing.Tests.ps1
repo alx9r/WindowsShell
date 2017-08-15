@@ -2,7 +2,7 @@
 
 . "$PSScriptRoot\TestFunctions\resourcePlumbing.ps1"
 
-foreach ( $resourceName in 'Shortcut')#'ShellLibrary','ShellLibraryFolder','Shortcut' )
+foreach ( $resourceName in 'Shortcut','ShellLibrary','ShellLibraryFolder')
 {
     $params = New-Object psobject -Property @{
         ModuleName = 'WindowsShell'

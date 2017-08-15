@@ -17,12 +17,14 @@ function Invoke-ProcessShellLibraryFolder
         [Parameter(Mandatory = $true,
                    Position = 3,
                    ValueFromPipelineByPropertyName = $true)]
+        [string]
         [Alias('Name')]
         $LibraryName,
 
         [Parameter(Mandatory = $true,
                    Position = 4,
                    ValueFromPipelineByPropertyName = $true)]
+        [string[]]
         $FolderPath
     )
     process

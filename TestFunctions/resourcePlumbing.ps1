@@ -297,6 +297,12 @@ function Test-ResourcePlumbing
             {
                 $parameters.$($variable.Name) = [System.Enum]::GetValues($variable.PropertyType)[0]
             }
+            # if it's a nullable enum, use the first value
+            elseif ( $variable.PropertyType.Name -eq 'Nullable`1' -and
+                     $variable.PropertyType.GenericTypeArguments.BaseType -eq [System.Enum] )
+            {
+                $parameters.$($variable.Name) = [System.Enum]::GetValues($variable.PropertyType.GenericTypeArguments[0])[0]
+            }
             # if there is a default value, use it
             elseif ( $object.$($variable.Name)  )
             {

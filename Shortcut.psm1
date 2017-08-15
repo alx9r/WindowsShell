@@ -22,16 +22,16 @@ class Shortcut
     $WorkingDirectory
 
     [DscProperty()]
-    [WindowStyle]
-    $WindowStyle=[WindowStyle]::Normal
+    [System.Nullable[WindowStyle]]
+    $WindowStyle
 
     [DscProperty()]
     [string]
     $Hotkey
 
     [DscProperty()]
-    [StockIconName]
-    $StockIconName = [StockIconName]::DoNotSet
+    [System.Nullable[StockIconName]]
+    $StockIconName
 
     [DscProperty()]
     [string]

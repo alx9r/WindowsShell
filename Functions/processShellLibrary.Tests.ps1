@@ -63,7 +63,6 @@ Describe 'Invoke-ProcessShellLibrary' {
                 Mode = 'Set'
                 Ensure = 'Present'
                 Name = 'name'
-                TypeName = 'DoNotSet'
             }
             $r = $params | Invoke-ProcessShellLibrary
             $r.Count | Should be 1
