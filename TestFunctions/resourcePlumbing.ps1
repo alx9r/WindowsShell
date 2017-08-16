@@ -95,6 +95,12 @@
                     ? { $_.MemberName -eq 'Key' }
                 $r | Should not beNullOrEmpty
             }
+            It 'no default property values evaluates to true' {
+                $r = $h.o.GetType().GetProperties() |
+                    % Name |
+                    ? { $h.o.$_ }
+                $r | Should beNullOrEmpty
+            }
         }
         if ( Get-Member -InputObject $h.o -MemberType Property -Name 'Ensure' )
         {
@@ -180,6 +186,15 @@ function Test-ProcessFunction
                         $r | Should be $defaultValue
                     }
                 }
+                else
+                {
+                    It 'does not have a default value' {
+                        $r = $function.ScriptBlock.Ast.Body.ParamBlock.Parameters.
+                            Where({$_.Name.VariablePath.UserPath -eq $name}).
+                            DefaultValue
+                        $r | Should beNullOrEmpty
+                    }
+                }
                 It "is a positional argument" {
                     $r = $function.Parameters.$name.Attributes | 
                         ? { $_.TypeId.Name -eq 'ParameterAttribute' } | 
@@ -224,6 +239,22 @@ function Test-ProcessFunction
                 It 'does not use a validation script' {
                     $r = $parameter.Attributes | 
                         ? {$_.TypeId.Name -eq 'ValidateScriptAttribute'} 
+                    $r | Should beNullOrEmpty
+                }
+            }
+        }
+        foreach ( $parameter in (
+            $function.Parameters.Values | 
+                ? {$_.Name -notin (Get-CommonParameterNames)} |
+                ? {$_.Name -notin 'Mode','Ensure'}
+            )
+        )
+        {
+            Context "Resource Parameters: $($parameter.Name)" {
+                It 'has no default value' {
+                    $r = $function.ScriptBlock.Ast.Body.ParamBlock.Parameters.
+                        Where({$_.Name.VariablePath.UserPath -eq $($parameter.name)}).
+                        DefaultValue
                     $r | Should beNullOrEmpty
                 }
             }

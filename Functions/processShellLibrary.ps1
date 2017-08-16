@@ -63,7 +63,7 @@ function Invoke-ProcessShellLibrary
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [int]
-        $IconResourceId=0
+        $IconResourceId
     )
     process
     {
