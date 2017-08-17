@@ -71,5 +71,37 @@ Describe 'Invoke-ProcessShortcut' {
             }
         }
     }
+    Context 'null optional' {
+        Mock Invoke-ProcessPersistentItem { 'return value' } -Verifiable
+        It 'returns exactly one item' {
+            $params = New-Object psobject -Property @{
+                Mode = 'Set'
+                Ensure = 'Present'
+                Path = 'path'
+                TargetPath = $null
+                Arguments = $null
+                WorkingDirectory = $null
+                WindowStyle = $null
+                Hotkey = $null
+                StockIconName = $null
+                IconFilePath = $null
+                IconResourceId = $null
+                Description = $null
+            }
+            $r = $params | Invoke-ProcessShortcut
+            $r.Count | Should be 1
+            $r | Should be 'return value'
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Invoke-ProcessPersistentItem 1 {
+                $Mode -eq 'Set' -and
+                $Ensure -eq 'Present' -and
+                $_Keys.Path -eq 'path' -and
+
+                #Properties
+                $Properties.Count -eq 0
+            }
+        }
+    }
 }
 }

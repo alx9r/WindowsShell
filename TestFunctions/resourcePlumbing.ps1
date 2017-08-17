@@ -95,11 +95,20 @@
                     ? { $_.MemberName -eq 'Key' }
                 $r | Should not beNullOrEmpty
             }
-            It 'no default property values evaluates to true' {
-                $r = $h.o.GetType().GetProperties() |
-                    % Name |
-                    ? { $h.o.$_ }
-                $r | Should beNullOrEmpty
+            foreach ( $propertyName in $h.o | Get-Member -MemberType Property | % Name )
+            {
+                if ( $propertyName -eq 'Ensure' )
+                {
+                    It 'Ensure : has default value of "Present"' {
+                        $h.o.Ensure | Should be 'Present'
+                    }
+                }
+                else
+                {
+                    It "$propertyName : default value is null" {
+                        $null -eq $h.o.$propertyName | Should be $true
+                    }
+                }
             }
         }
         if ( Get-Member -InputObject $h.o -MemberType Property -Name 'Ensure' )
@@ -155,8 +164,8 @@ function Test-ProcessFunction
         }
         $function = (Get-Module $ModuleName).ExportedFunctions.$FunctionName
         foreach ( $values in @(
-            @('Mode',   'design_requires', 'mandatory', $null,    1, 'Mode'),
-            @('Ensure', $null,             $null,       'Present',2, 'Ensure')
+            @('Mode',   'design_requires', 'mandatory', $null,    1, 'System.Nullable[Mode]'),
+            @('Ensure', $null,             $null,       'Present',2, 'System.Nullable[Ensure]')
         ))
         {
             $name,$designRequires,$mandatory,$defaultValue,$position,$typeName = $values
@@ -236,11 +245,44 @@ function Test-ProcessFunction
                         ? { $_.TypeId.Name -eq 'ParameterAttribute' }                    
                     $r.ValueFromPipelineByPropertyName | Should be $true
                 }
-                It 'does not use a validation script' {
-                    $r = $parameter.Attributes | 
-                        ? {$_.TypeId.Name -eq 'ValidateScriptAttribute'} 
-                    $r | Should beNullOrEmpty
+                
+                $parameter_ = $function.ScriptBlock.Ast.Body.ParamBlock.Parameters.
+                        Where({$_.Name.VariablePath.UserPath -eq $($parameter.name)})
+
+                if ( $parameter_.StaticType.IsValueType )
+                {
+                    It 'is a Nullable value type' {
+                        $r = $parameter_.StaticType.Name
+                        $r | Should be 'Nullable`1'
+                    }
                 }
+                elseif ( $function.Parameters.$($parameter.Name).Attributes | 
+                            ? { $_.TypeId.Name -eq 'ParameterAttribute' } |
+                            % Mandatory )
+                {
+                    It 'has a static type' {
+                        $parameter_.StaticType |
+                            Should not beNullOrEmpty
+                    }
+                }
+                else
+                {
+                    It 'does not declare a type' {
+                        $parameter_.StaticType |
+                            Should be 'System.Object'
+                    }
+                    It 'omit [AllowNull()]' {
+                        $r = $parameter.Attributes | 
+                            ? {$_.TypeId -match 'AllowNull' }
+                        $r | Should beNullOrEmpty
+                    }
+                    It 'does not use a validation script' {
+                        $r = $parameter.Attributes | 
+                            ? {$_.TypeId.Name -eq 'ValidateScriptAttribute'} 
+                        $r | Should beNullOrEmpty
+                    }
+                }
+
             }
         }
         foreach ( $parameter in (
@@ -304,17 +346,39 @@ function Test-ResourcePlumbing
                 Sort
             $memberNames | Should be $parameterNames
         }
-        Context 'the member and parameter types match' {
+        Context 'the parameter/member correlation' {
             $members = $object.GetType().GetMembers() |
                 ? {$_.MemberType -eq 'Property' }
             foreach ( $member in $members )
             {
                 $name = $member.Name
-                It $name {
-                    $memberType = $member.PropertyType
-                    $parameterType = $function.Parameters.$name.ParameterType
+
+                $parameter = $function.Parameters.$name
+                $parameter_ = $function.ScriptBlock.Ast.Body.ParamBlock.Parameters.
+                        Where({$_.Name.VariablePath.UserPath -eq $name})
+
+                if ( $parameter_.StaticType.IsValueType )
+                {
+                    It "$name : the parameter type matches the member type" {
+                        $memberType = $member.PropertyType
+                        $parameterType = $parameter.ParameterType
                     
-                    $memberType | Should be $parameterType
+                        $parameterType | Should be $memberType
+                    }
+                }
+                It "$name : the parameter mandatoriness matches the member mandatoriness" {
+                    $parameterMandatory = [bool]($function.Parameters.$name.Attributes | 
+                        ? { $_.TypeId.Name -eq 'ParameterAttribute' } |
+                        % Mandatory)
+                    $memberMandatory = [bool]($object.GetType().DeclaredMembers | 
+                        ? {$_.Name -eq $name } | 
+                        % CustomAttributes | 
+                        ? {$_.AttributeType -match 'DscProperty' } | 
+                        % NamedArguments | 
+                        ? {$_.MemberName -eq 'Mandatory' } | 
+                        % TypedValue | 
+                        % Value)
+                    $parameterMandatory | Should be $memberMandatory
                 }
             }
         }
@@ -333,6 +397,12 @@ function Test-ResourcePlumbing
                      $variable.PropertyType.GenericTypeArguments.BaseType -eq [System.Enum] )
             {
                 $parameters.$($variable.Name) = [System.Enum]::GetValues($variable.PropertyType.GenericTypeArguments[0])[0]
+            }
+            # if it's a nullable int, use 0
+            elseif ( $variable.PropertyType.Name -eq 'Nullable`1' -and
+                 $variable.PropertyType.BaseType -eq [System.ValueType] )
+            {
+                $parameters.$($variable.Name) = 0
             }
             # if there is a default value, use it
             elseif ( $object.$($variable.Name)  )

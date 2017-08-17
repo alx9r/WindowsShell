@@ -6,12 +6,12 @@ function Invoke-ProcessShellLibraryFolder
         [Parameter(Mandatory = $true,
                    Position = 1,
                    ValueFromPipelineByPropertyName = $true)]
-        [Mode]
+        [System.Nullable[Mode]]
         $Mode,
 
         [Parameter(Position = 2,
                    ValueFromPipelineByPropertyName = $true)]
-        [Ensure]
+        [System.Nullable[Ensure]]
         $Ensure = 'Present',
 
         [Parameter(Mandatory = $true,

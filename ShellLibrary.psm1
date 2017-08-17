@@ -1,13 +1,13 @@
 [DscResource()]
 class ShellLibrary
 {
-    [DscProperty(Key)]
+    [DscProperty(Key,Mandatory)]
     [string]
     $Name
 
     [DscProperty()]
-    [Ensure]
-    $Ensure
+    [System.Nullable[Ensure]]
+    $Ensure = 'Present'
 
     [DscProperty()]
     [System.Nullable[LibraryTypeName]]
@@ -22,7 +22,7 @@ class ShellLibrary
     $IconFilePath
 
     [DscProperty()]
-    [int]
+    [System.Nullable[int]]
     $IconResourceId
 
     [void] Set() { $this | Invoke-ProcessShellLibrary Set }

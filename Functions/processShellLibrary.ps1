@@ -34,18 +34,17 @@ function Invoke-ProcessShellLibrary
         [Parameter(Mandatory = $true,
                    Position = 1,
                    ValueFromPipelineByPropertyName = $true)]
-        [Mode]
+        [System.Nullable[Mode]]
         $Mode,
 
         [Parameter(Position = 2,
                    ValueFromPipelineByPropertyName = $true)]
-        [Ensure]
+        [System.Nullable[Ensure]]
         $Ensure = 'Present',
 
         [Parameter(Mandatory = $true,
                    Position = 3,
                    ValueFromPipelineByPropertyName = $true)]
-        [string]
         [Alias('LibraryName')]
         $Name,
 
@@ -58,11 +57,10 @@ function Invoke-ProcessShellLibrary
         $StockIconName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
         $IconFilePath,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [int]
+        [System.Nullable[int]]
         $IconResourceId
     )
     process

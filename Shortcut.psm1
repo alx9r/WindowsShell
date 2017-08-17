@@ -1,13 +1,13 @@
 [DscResource()]
 class Shortcut
 {
-    [DscProperty(Key)]
+    [DscProperty(Key,Mandatory)]
     [string]
     $Path
 
     [DscProperty()]
-    [Ensure]
-    $Ensure
+    [System.Nullable[Ensure]]
+    $Ensure = 'Present'
 
     [DscProperty()]
     [string]
@@ -38,7 +38,7 @@ class Shortcut
     $IconFilePath
 
     [DscProperty()]
-    [int]
+    [System.Nullable[int]]
     $IconResourceId
 
     [DscProperty()]

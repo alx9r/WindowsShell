@@ -1,7 +1,7 @@
 [DscResource()]
 class ShellLibraryFolder
 {
-    [DscProperty(Key)]
+    [DscProperty(Key,Mandatory)]
     [string]
     $LibraryName
 
@@ -10,8 +10,8 @@ class ShellLibraryFolder
     $FolderPath
 
     [DscProperty()]
-    [Ensure]
-    $Ensure
+    [System.Nullable[Ensure]]
+    $Ensure = 'Present'
 
     [void] Set()
     {

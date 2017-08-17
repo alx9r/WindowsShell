@@ -6,33 +6,29 @@ function Invoke-ProcessShortcut
         [Parameter(Mandatory = $true,
                    Position = 1,
                    ValueFromPipelineByPropertyName = $true)]
-        [Mode]
+        [System.Nullable[Mode]]
         $Mode,
 
         [Parameter(Position = 2,
                    ValueFromPipelineByPropertyName = $true)]
-        [Ensure]
+        [System.Nullable[Ensure]]
         $Ensure = 'Present',
 
         [Parameter(Mandatory = $true,
                    Position = 3,
                    ValueFromPipelineByPropertyName = $true)]
         [Alias('FullName')]
-        [string]
         $Path,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('Target')]
-        [string]
         $TargetPath,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
         $Arguments,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('StartIn','WorkingFolder')]
-        [string]
         $WorkingDirectory,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
@@ -42,7 +38,6 @@ function Invoke-ProcessShortcut
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('ShortcutKey')]
-        [string]
         $Hotkey,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
@@ -50,16 +45,14 @@ function Invoke-ProcessShortcut
         $StockIconName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
         $IconFilePath,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [int]
+        [System.Nullable[int]]
         $IconResourceId,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('Comment')]
-        [string]
         $Description
     )
     process

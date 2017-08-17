@@ -79,5 +79,31 @@ Describe 'Invoke-ProcessShellLibrary' {
             }
         }
     }
+    Context 'null optional' {
+        It 'returns exactly one item' {
+            $params = New-Object psobject -Property @{
+                Mode = 'Set'
+                Ensure = 'Present'
+                Name = 'name'
+                TypeName = $null
+                StockIconName = $null
+                IconFilePath = $null
+                IconResourceId = $null
+            }
+            $r = $params | Invoke-ProcessShellLibrary
+            $r.Count | Should be 1
+            $r | Should be 'return value'
+        }
+        It 'correctly invokes functions' {
+            Assert-MockCalled Invoke-ProcessPersistentItem 1 {
+                $Mode -eq 'Set' -and
+                $Ensure -eq 'Present' -and
+                $_Keys.Name -eq 'name' -and
+
+                #Properties
+                $Properties.Count -eq 0
+            }
+        }
+    }
 }
 }
