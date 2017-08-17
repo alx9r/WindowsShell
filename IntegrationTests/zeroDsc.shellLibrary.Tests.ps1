@@ -3,7 +3,7 @@ if ( -not (Get-Module ZeroDsc -ListAvailable) )
     return
 }
 
-Remove-Module WindowsShell -fo -ea si; Import-Module WindowsShell
+Import-Module WindowsShell -Force
 Import-Module PSDesiredStateConfiguration, ZeroDsc
 
 Describe 'Invoke with ZeroDsc (ShellLibrary)' {
@@ -18,14 +18,13 @@ Describe 'Invoke with ZeroDsc (ShellLibrary)' {
         }
     }
     Context ShellLibrary {
-        $document = [scriptblock]::Create(@"
-            Get-DscResource ShellLibrary WindowsShell | Import-DscResource
-            ShellLibrary MyLib @{ Name = '$libraryName1' }
-"@
-        )
         $h = @{}
         It 'create instructions' {
-            $h.i = ConfigInstructions SomeName $document
+            $h.i = ConfigInstructions SomeName {
+                $r = Get-DscResource ShellLibrary WindowsShell
+                $r | Import-DscResource
+                ShellLibrary MyLib @{ Name = $libraryName1 }
+            }
         }
         foreach ( $step in $h.i )
         {
@@ -36,17 +35,15 @@ Describe 'Invoke with ZeroDsc (ShellLibrary)' {
         }
     }
     Context ShellLibraryFolder {
-        $document = [scriptblock]::Create(@"
-            Get-DscResource ShellLibraryFolder WindowsShell | Import-DscResource
-            ShellLibraryFolder MyDir @{
-                LibraryName = '$libraryName1'
-                FolderPath = '$folderPath'
-            }
-"@
-        )
         $h = @{}
         It 'create instructions' {
-            $h.i = ConfigInstructions SomeName $document
+            $h.i = ConfigInstructions SomeName {
+                Get-DscResource ShellLibraryFolder WindowsShell | Import-DscResource
+                ShellLibraryFolder MyDir @{
+                    LibraryName = $libraryName1
+                    FolderPath = $folderPath
+                }
+            }
         }
         foreach ( $step in $h.i )
         {
@@ -57,19 +54,17 @@ Describe 'Invoke with ZeroDsc (ShellLibrary)' {
         }
     }
     Context 'combined' {
-        $document = [scriptblock]::Create(@"
-        Get-DscResource -Module WindowsShell | Import-DscResource
-        ShellLibraryFolder MyDir @{
-            LibraryName = '$libraryName2'
-            FolderPath = '$folderPath'
-            DependsOn = '[ShellLibrary]MyLib'
-        }
-        ShellLibrary MyLib @{ Name = '$libraryName2' }
-"@
-        )
-            $h = @{}
+        $h = @{}
         It 'create instructions' {
-            $h.i = ConfigInstructions SomeName $document
+            $h.i = ConfigInstructions SomeName {
+                Get-DscResource -Module WindowsShell | Import-DscResource
+                ShellLibraryFolder MyDir @{
+                    LibraryName = $libraryName2
+                    FolderPath = $folderPath
+                    DependsOn = '[ShellLibrary]MyLib'
+                }
+                ShellLibrary MyLib @{ Name = $libraryName2 }
+            }
         }
         foreach ( $step in $h.i )
         {
@@ -85,8 +80,8 @@ Describe 'Invoke with ZeroDsc (ShellLibrary)' {
             Test-Path $folderPath | Should be $false
         }
         It 'remove the libraries' {
-            $libraryName1,$libraryName2 | Invoke-ProcessShellLibrary Set Absent
-            ( $libraryName1,$libraryName2 | Invoke-ProcessShellLibrary Test Absent ) -ne
+            $libraryName1,$libraryName2 |  % { Invoke-ProcessShellLibrary Set Absent -Name $_ }
+            ( $libraryName1,$libraryName2 | % { Invoke-ProcessShellLibrary Test Absent -Name $_ } ) -ne
                 $true |
                 Should beNullOrEmpty
         }

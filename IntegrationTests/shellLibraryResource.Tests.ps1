@@ -1,4 +1,4 @@
-Remove-Module WindowsShell -fo -ea si; Import-Module WindowsShell
+Import-Module WindowsShell -Force
 Import-Module PSDesiredStateConfiguration
 
 Describe 'ShellLibrary Resource' {

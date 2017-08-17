@@ -6,32 +6,33 @@ function Invoke-ProcessShellLibraryFolder
         [Parameter(Mandatory = $true,
                    Position = 1,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Set','Test')]
+        [System.Nullable[Mode]]
         $Mode,
 
         [Parameter(Position = 2,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Present','Absent')]
+        [System.Nullable[Ensure]]
         $Ensure = 'Present',
 
         [Parameter(Mandatory = $true,
                    Position = 3,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
-        [Alias('Name')]
         [string]
+        [Alias('Name')]
         $LibraryName,
 
         [Parameter(Mandatory = $true,
                    Position = 4,
-                   ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateScript({ $_ | Test-ValidFilePath })]
-        [string]
+        [string[]]
         $FolderPath
     )
     process
     {
+        # validate parameters
+        $LibraryName | ? {$_} | Test-ValidShellLibraryName -ea Stop | Out-Null
+        $FolderPath | ? {$_} | Test-ValidFilePath -ea Stop | Out-Null
+
         $splat = @{
             Mode = $Mode
             Ensure = $Ensure

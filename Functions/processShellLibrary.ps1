@@ -34,42 +34,39 @@ function Invoke-ProcessShellLibrary
         [Parameter(Mandatory = $true,
                    Position = 1,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Set','Test')]
+        [System.Nullable[Mode]]
         $Mode,
 
         [Parameter(Position = 2,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Present','Absent')]
+        [System.Nullable[Ensure]]
         $Ensure = 'Present',
 
         [Parameter(Mandatory = $true,
                    Position = 3,
-                   ValueFromPipeline = $true,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateScript({ $_ | Test-ValidShellLibraryName })]
         [Alias('LibraryName')]
-        [string]
         $Name,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
+        [System.Nullable[LibraryTypeName]]
         $TypeName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
+        [System.Nullable[StockIconName]]
         $StockIconName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
         $IconFilePath,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [int]
-        $IconResourceId=0
+        [System.Nullable[int]]
+        $IconResourceId
     )
     process
     {
         # validate parameters
+        $Name | ? {$_} | Test-ValidShellLibraryName -ea Stop | Out-Null
         $IconFilePath | ? {$_} | Test-ValidFilePath -ea Stop | Out-Null
         $TypeName | ? {$_} | Test-ValidShellLibraryTypeName -ea Stop | Out-Null
         $StockIconName | ? {$_} | Test-ValidStockIconName -ea Stop | Out-Null
@@ -77,8 +74,7 @@ function Invoke-ProcessShellLibrary
         # pass through properties
         $properties = @{}
         'TypeName' |
-            ? { $_ -in $PSCmdlet.MyInvocation.BoundParameters.Keys } |
-            ? { (Get-Variable $_ -ValueOnly) -ne 'DoNotSet' } |
+            ? { $null -ne (Get-Variable $_ -ValueOnly) } |
             % { $properties.$_ = Get-Variable $_ -ValueOnly }
 
 

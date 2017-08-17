@@ -6,60 +6,53 @@ function Invoke-ProcessShortcut
         [Parameter(Mandatory = $true,
                    Position = 1,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Set','Test')]
+        [System.Nullable[Mode]]
         $Mode,
 
         [Parameter(Position = 2,
                    ValueFromPipelineByPropertyName = $true)]
-        [ValidateSet('Present','Absent')]
+        [System.Nullable[Ensure]]
         $Ensure = 'Present',
 
         [Parameter(Mandatory = $true,
                    Position = 3,
                    ValueFromPipelineByPropertyName = $true)]
         [Alias('FullName')]
-        [string]
         $Path,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('Target')]
-        [string]
         $TargetPath,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
         $Arguments,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('StartIn','WorkingFolder')]
-        [string]
         $WorkingDirectory,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('Run')]
-        [WindowStyle]
+        [System.Nullable[WindowStyle]]
         $WindowStyle,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('ShortcutKey')]
-        [string]
         $Hotkey,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
+        [System.Nullable[StockIconName]]
         $StockIconName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [string]
         $IconFilePath,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [int]
-        $IconResourceId=0,
+        [System.Nullable[int]]
+        $IconResourceId,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Alias('Comment')]
-        [string]
         $Description
     )
     process
@@ -68,7 +61,7 @@ function Invoke-ProcessShortcut
         $properties = @{}
         'TargetPath','Arguments','WorkingDirectory',
         'WindowStyle','Hotkey','Description' |
-            ? { $_ -in $PSCmdlet.MyInvocation.BoundParameters.Keys } |
+            ? { Get-Variable $_ -ValueOnly } |
             % { $properties.$_ = Get-Variable $_ -ValueOnly }
 
 

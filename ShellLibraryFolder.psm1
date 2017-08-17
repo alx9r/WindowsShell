@@ -1,13 +1,7 @@
-enum Ensure
-{
-    Present
-    Absent
-}
-
 [DscResource()]
 class ShellLibraryFolder
 {
-    [DscProperty(Key)]
+    [DscProperty(Key,Mandatory)]
     [string]
     $LibraryName
 
@@ -16,18 +10,18 @@ class ShellLibraryFolder
     $FolderPath
 
     [DscProperty()]
-    [Ensure]
-    $Ensure
+    [System.Nullable[Ensure]]
+    $Ensure = 'Present'
 
     [void] Set()
     {
-        $this.FolderPath | 
-            Invoke-ProcessShellLibraryFolder Set  $this.Ensure $this.LibraryName
+        $this.FolderPath |
+            % { $this | Invoke-ProcessShellLibraryFolder Set -FolderPath $_ }
     }
     [bool] Test()
     {
         $numSucceeded = $this.FolderPath |
-            Invoke-ProcessShellLibraryFolder Test $this.Ensure $this.LibraryName |
+            % { $this | Invoke-ProcessShellLibraryFolder Test -FolderPath $_ }  |
             ? { $_ -eq $true } |
             Measure-Object |
             % Count
